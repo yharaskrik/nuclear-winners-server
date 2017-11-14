@@ -1,0 +1,15 @@
+runtime: python
+api_version: 1
+threadsafe: true
+env: flex
+
+runtime_config:
+  python_version: 3
+
+# [START handlers]
+handlers:
+- url: /static
+  static_dir: static
+- url: /.*
+  script: nuclear-winner-server.app
+# [END handlers]
