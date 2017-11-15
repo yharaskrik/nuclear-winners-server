@@ -1,2 +1,4 @@
-from flask import Flask
-app = Flask(__name__)
+from flask import Blueprint
+views = Blueprint('views', __name__)
+
+from .jay import *
