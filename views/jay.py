@@ -8,7 +8,7 @@ except ImportError:
 from . import views as app
 
 # This might change when andrew switches the DB
-connection = pymysql.connect(host='65.99.240.118',
+connection = pymysql.connect(host='72.249.48.95',
                              user='geaxyckp_nuclear_winter',
                              password='.EoP0Ea#i&,{',
                              db='geaxyckp_nuclear_winter',
