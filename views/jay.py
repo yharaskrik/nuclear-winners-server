@@ -8,10 +8,10 @@ except ImportError:
 from . import views as app
 
 # This might change when andrew switches the DB
-connection = pymysql.connect(host='72.249.49.248',
-                             user='mkvawvog_andrew',
-                             password='UJ@9YRY^vuP&',
-                             db='mkvawvog_nuclear_winner',
+connection = pymysql.connect(host='65.99.240.118',
+                             user='geaxyckp_nuclear_winter',
+                             password='.EoP0Ea#i&,{',
+                             db='geaxyckp_nuclear_winter',
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
 
