@@ -20,6 +20,7 @@ def login():
             session["user_id"] = u["id"]
             session["user_name"] = u["name"]
             session["user_username"] = u["username"]
+            session["user_admin"] = u['accountType'] == 1
             session["logged_in"] = True
             return flask.redirect("/")
     return render_template("login.html", errormsg="Invalid username or password")
@@ -27,5 +28,8 @@ def login():
 @app.route("/user/logout")
 def logout():
     del(session["user_id"])
+    del(session["user_name"])
+    del(session["user_username"])
+    session['user_admin'] = False
     session["logged_in"] = False
     return flask.redirect("/")

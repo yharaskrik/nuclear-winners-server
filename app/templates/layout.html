@@ -19,7 +19,22 @@
             </div>
         {% endif %}
     </div>
-    {% block body %}{% endblock %}
+
+    <div class="content">
+        <div class="flash">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class=flashes>
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        {% block body %}{% endblock %}
+    </div>
 </div>
 </body>
 </html>

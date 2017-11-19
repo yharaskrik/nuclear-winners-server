@@ -64,3 +64,5 @@ def session_view():
 def add_session():
     session["name"] = "klasjdfl"
     return flask.redirect("/session")
+
+from .product import *

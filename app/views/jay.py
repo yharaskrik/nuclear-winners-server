@@ -16,15 +16,15 @@ connection = pymysql.connect(host='72.249.48.95',
                              cursorclass=pymysql.cursors.DictCursor)
 
 # Look here for querying
-# https://github.com/PyMySQL/PyMySQL
-
-@app.route('/')
-def index():
-    # I created a customer table i the DB right now so yo guys could practice
-    # it only has one record with one column 'id'
-    with connection.cursor() as cursor:
-        cursor.execute('select * from customer')
-        result = cursor.fetchone()
-        print(result)
-        # This will return the parsed json from the DB
-        return jsonify(result)
+# # https://github.com/PyMySQL/PyMySQL
+#
+# @app.route('/')
+# def index():
+#     # I created a customer table i the DB right now so yo guys could practice
+#     # it only has one record with one column 'id'
+#     with connection.cursor() as cursor:
+#         cursor.execute('select * from customer')
+#         result = cursor.fetchone()
+#         print(result)
+#         # This will return the parsed json from the DB
+#         return jsonify(result)

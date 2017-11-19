@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h2>{{ product.name }}</h2><br>
+    {% if session.user_admin %}
+        <a href="{{ url_for('edit_product', sku=product.sku) }}">Edit</a><br>
+    {% endif %}
+    <br/>
+    <img src="/product/{{ product.sku }}/image.jpg" width="100"/>
+    <table>
+        <tr>
+            <td>{{ product.description }}</td>
+        </tr>
+        <tr>
+            <td>{% if product.inventory  and product.inventory > 0 %}{{ product.inventory }} in stock!{% else %}Out of
+                stock!{% endif %}</td>
+        </tr>
+        <tr>
+            <td>{{ product.price }} caps</td>
+        </tr>
+        <tr>
+            <td>{{ product.weight }} kg</td>
+        </tr>
+    </table>
+
+{% endblock %}
