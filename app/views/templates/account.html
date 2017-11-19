@@ -2,9 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <title>Account Information</title>
 </head>
 <body>
-$END$
+Name: {{ user.name }}<br>
+Faction: {{ user.faction }}<br>
+Address: {{ user.address }}<br>
+
+<form action='http://127.0.0.1:5000/account/1/orders'>
+    <input type='submit' value='Order History'/>
+
+</form>
 </body>
 </html>
