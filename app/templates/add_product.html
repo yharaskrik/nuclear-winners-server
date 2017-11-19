@@ -1,6 +1,5 @@
-<html>
-
-<body>
+{% extends "layout.html" %}
+{% block body %}
 <form enctype="multipart/form-data" method="post" action="/product/add">
     <input type="file" name="image" accept="image/*"/>
     <input type="text" name="name" placeholder="Product Name"/>
@@ -9,6 +8,4 @@
     <input type="number" name="weight" step="any" >
     <input type="submit" name="Submit`">
 </form>
-</body>
-
-</html>
+{% endblock %}

@@ -1,10 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Order History</title>
-</head>
-<body>
+{% extends 'layout.html' %}
+{% block body %}
 <table border=1>
     <tr>
         <td> ShipmentID</td>
@@ -44,5 +39,4 @@
         </tr>
     {% endfor %}
 </table>
-</body>
-</html>
+{% endblock %}
