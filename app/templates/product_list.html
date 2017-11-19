@@ -5,6 +5,10 @@
     <title>Products</title>
 </head>
 <body>
+<form method="get" action="{{ url_for("view_products") }}">
+    <input type="text" placeholder="Search" name="search" value="{{ search }}">
+    <input type="submit">
+</form>
 <table border="1">
     {% for item in products %}
         <tr>

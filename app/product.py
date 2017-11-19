@@ -9,16 +9,27 @@ create_prod_sql_with_image = "INSERT INTO Product (name, description , price, we
 create_prod_sql_no_image = "INSERT INTO Product (name, description , price, weight, inventory, visible) VALUES (%s, %s, %s, %s, %s, %s)"
 update_prod_sql_no_image = "UPDATE Product SET name = %s, description=%s, price=%s, weight = %s, inventory = %s, visible = %s WHERE sku = %s"
 update_prod_sql_with_image = "UPDATE Product SET name = %s, description=%s, price=%s, weight = %s, inventory = %s, visible = %s, image=%s WHERE sku = %s"
+
 get_prod_sql = "SELECT sku, name, description, price, inventory, weight, visible FROM Product WHERE sku = %s"
+
+list_prod_sql = "SELECT * FROM Product"
+filter_prod_sql = "SELECT * FROM Product WHERE name LIKE %s"
 
 
 @app.route("/products/", methods=['GET'])
 def view_products():
+    sql = list_prod_sql
+    args = []
+    search = ""
+    if 'search' in request.args:
+        sql = filter_prod_sql
+        search = request.args["search"]
+        args.append("%" + request.args["search"] + "%")
 
     with get_db().cursor() as cursor:
-        cursor.execute("Select * from Product")
+        cursor.execute(sql, args)
         result = cursor.fetchall()
-        return render_template("product_list.html", products=result)
+        return render_template("product_list.html", products=result, search=search)
 
 
 @app.route("/product/<sku>")
