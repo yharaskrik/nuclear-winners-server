@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuclear Winners</title>
+</head>
+<body>
+<div class="page">
+    <div class="header">
+        {% if not session.logged_in %}
+            <a href="{{ url_for('views.login') }}">log in</a>
+        {% else %}
+            <a href="{{ url_for('views.logout') }}">log out</a>
+        {% endif %}
+    </div>
+    {% block body %}{% endblock %}
+</div>
+</body>
+</html>

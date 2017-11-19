@@ -1,13 +1,12 @@
-from flask import Blueprint, Flask
+from flask import Blueprint
 
-from app import app
-from app import get_db
+from app import app, get_db
 
-views = Blueprint('views', __name__, template_folder='templates')
-views = Blueprint('views', __name__,template_folder='templates')
+views = Blueprint('views', __name__)
 
 from .andrew import *
 from .jay import *
+from .user_login import *
 from .mike import *
 from .trevor import *
 

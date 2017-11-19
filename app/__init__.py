@@ -1,4 +1,6 @@
-from flask import Flask, g
+import flask
+from flask import Flask, g, render_template, session
+import config
 
 try:
     import pymysql
@@ -6,8 +8,10 @@ try:
     pymysql.install_as_MySQLdb()
 except ImportError:
     pass
+import os
 
-app = Flask("name")
+app = Flask(__name__)
+app.config.from_object(config)
 
 
 def connect_db():
@@ -35,5 +39,28 @@ def close_db(error):
     if hasattr(g, 'db_connection'):
         g.db_connection.close()
 
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def main_page(path):
+    return render_template("index.html")
+
+
 from app.views import views as views
+
 app.register_blueprint(views)
+
+
+@app.route("/session")
+def session_view():
+    print(session.get("name", "Default"))
+    output = ""
+    for k in session.keys():
+        output += k + ": " + str(session[k]) + "\n"
+    return output
+
+
+@app.route("/session/add")
+def add_session():
+    session["name"] = "klasjdfl"
+    return flask.redirect("/session")
