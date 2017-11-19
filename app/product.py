@@ -12,12 +12,21 @@ update_prod_sql_with_image = "UPDATE Product SET name = %s, description=%s, pric
 get_prod_sql = "SELECT sku, name, description, price, inventory, weight, visible FROM Product WHERE sku = %s"
 
 
-@app.route("/product/<int:pid>")
-def view_product(pid):
+@app.route("/products/", methods=['GET'])
+def view_products():
+
+    with get_db().cursor() as cursor:
+        cursor.execute("Select * from Product")
+        result = cursor.fetchall()
+        return render_template("product_list.html", products=result)
+
+
+@app.route("/product/<sku>")
+def view_product(sku):
     """Displays a products"""
     try:
         with get_db().cursor() as cursor:
-            cursor.execute(get_prod_sql, int(pid))
+            cursor.execute(get_prod_sql, int(sku))
             product = cursor.fetchone()
             return render_template("product_details.html", product=product)
     except Exception as e:
@@ -65,7 +74,7 @@ def edit_product(sku):
         with get_db().cursor() as cursor:
             cursor.execute(sql, args)
             flash("Updated product")
-            return redirect(url_for("view_product", pid=sku))
+            return redirect(url_for("view_product", sku=sku))
     except Exception as e:
         print(e)
     flash("Unable to Edit product")
@@ -98,7 +107,7 @@ def add_product():
         with get_db().cursor() as cursor:
             rows = cursor.execute(sql, args)
             if rows == 1:
-                return redirect(url_for("view_product", pid=cursor.lastrowid))
+                return redirect(url_for("view_product", sku=cursor.lastrowid))
     except Exception as e:
         print(e)
     flash("Unable to create product")
@@ -106,7 +115,7 @@ def add_product():
 
 
 @app.route("/product/<int:sku>/image.jpg")
-def get_product_picture(sku):
+def product_picture(sku):
     """Retrieves a product image from the database and server it as an image file"""
     sql = "SELECT image FROM Product WHERE sku = %s"
     with get_db().cursor() as cursor:
