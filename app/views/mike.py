@@ -35,5 +35,3 @@ def order_history(cid):
         return render_template('order_history.html', orders=orders)
 
 
-@app.route('/cart')
-def cart():
