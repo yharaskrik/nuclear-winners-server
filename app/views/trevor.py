@@ -1,6 +1,6 @@
 # @app.route('/get/Product/<type:param>')
 # def name(param)
-from flask import jsonify, request, render_template
+from flask import jsonify, request, render_template, session
 from . import get_db, app
 
 
@@ -21,10 +21,14 @@ def register_user():
     try:
         with get_db().cursor() as cursor:
             cursor.execute(sql,[data['name'],data['password'],data['address'],data['username']])
-        return 'success'
+            if not 'cart' in session:
+                cursor.execute('INSERT INTO Cart(userID) VALUES (%s)', cursor.lastrowid)
+        return render_template('login.html')
         #return redirect(url_for('/login'))
-    except Exception:
+    except Exception as e:
+        print(e)
         return render_template('register_user.html',data=data,errormsg='This username already exists')
+
 
 #allows admins to see a list of all customers
 @app.route('/admin/customers')
