@@ -9,8 +9,10 @@ try:
 except ImportError:
     pass
 import os
-app = Flask("name", template_folder="templates")
+
+app = Flask(__name__)
 app.config.from_object(config)
+
 
 def connect_db():
     """Connects to the applicaiton database"""
@@ -37,14 +39,15 @@ def close_db(error):
     if hasattr(g, 'db_connection'):
         g.db_connection.close()
 
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def main_page(path):
     return render_template("index.html")
 
 
-from .user import *
 from app.views import views as views
+
 app.register_blueprint(views)
 
 
@@ -55,6 +58,7 @@ def session_view():
     for k in session.keys():
         output += k + ": " + str(session[k]) + "\n"
     return output
+
 
 @app.route("/session/add")
 def add_session():

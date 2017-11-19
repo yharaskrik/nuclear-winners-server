@@ -8,9 +8,9 @@
 <div class="page">
     <div class="header">
         {% if not session.logged_in %}
-            <a href="{{ url_for('/user/login') }}">log in</a>
+            <a href="{{ url_for('views.login') }}">log in</a>
         {% else %}
-            <a href="{{ url_for('/user/logout') }}">log out</a>
+            <a href="{{ url_for('views.logout') }}">log out</a>
         {% endif %}
     </div>
     {% block body %}{% endblock %}

@@ -1,7 +1,6 @@
-from flask import Blueprint, Flask
+from flask import Blueprint
 
-from app import app
-from app import get_db
+from app import app, get_db
 
 views = Blueprint('views', __name__)
 
