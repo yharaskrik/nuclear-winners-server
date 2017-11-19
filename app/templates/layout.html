@@ -13,6 +13,10 @@
             </div>
         {% else %}
             <div style='float:right'>
+                <form method="get" action="{{ url_for("view_products") }}">
+                    <input type="text" placeholder="Search for products" name="search" value="{{ search }}">
+                    <input type="submit" value="Search">
+                </form>
                 <a href="{{ url_for('views.view_account') }}">{{ session.user_name }}</a>
                 <a href="{{ url_for('views.logout') }}">log out</a>
                 <a href="{{ url_for('views.cart') }}">cart</a>
@@ -20,7 +24,7 @@
         {% endif %}
     </div>
 
-    <div class="content">
+    <div class="content" style="clear: both">
         <div class="flash">
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
