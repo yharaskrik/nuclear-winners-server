@@ -7,3 +7,5 @@ views = Blueprint('views', __name__)
 from .andrew import *
 from .jay import *
 from .user_login import *
+from .trevor import *
+
