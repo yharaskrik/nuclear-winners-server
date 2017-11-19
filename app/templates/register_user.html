@@ -1,4 +1,4 @@
-{% extends layout.html %}
+{% extends 'layout.html' %}
 {% block body %}
 <p>{{ errormsg }}</p>
 <form action="/user/register" method="post">
@@ -11,4 +11,4 @@ Enter Address:<input type="text" name="address" size="200" value="{{ data['addre
 I am not a robot:<input type="checkbox" name="notrobot"><br>
 <input type="submit">
 </form>
-{% end block %}
+{% endblock %}
