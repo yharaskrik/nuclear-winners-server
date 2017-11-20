@@ -2,6 +2,6 @@
 {% block body %}
     <h1><a href="{{ url_for("view_products") }}">View Products</a></h1>
     {% if session.user_admin %}
-        <h1><a href="{{ url_for("add_product") }}">Add Product</a></h1>
+        <h1><a href="{{ url_for("admin") }}">Admin</a></h1>
     {% endif %}
 {% endblock %}
