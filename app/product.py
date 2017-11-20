@@ -1,16 +1,17 @@
 import io
 
-import flask
-from flask import request, render_template, jsonify, flash, url_for, redirect, session, send_file
+from flask import request, render_template, flash, url_for, redirect, send_file
 
 from app import app, get_db
+from .categories import fetch_categories
+from .views.user_login import requires_roles
 
-create_prod_sql_with_image = "INSERT INTO Product (name, description , price, weight, inventory, visible, image) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-create_prod_sql_no_image = "INSERT INTO Product (name, description , price, weight, inventory, visible) VALUES (%s, %s, %s, %s, %s, %s)"
-update_prod_sql_no_image = "UPDATE Product SET name = %s, description=%s, price=%s, weight = %s, inventory = %s, visible = %s WHERE sku = %s"
-update_prod_sql_with_image = "UPDATE Product SET name = %s, description=%s, price=%s, weight = %s, inventory = %s, visible = %s, image=%s WHERE sku = %s"
+create_prod_sql_with_image = "INSERT INTO Product (name, description , price, weight, inventory, visible, category, image) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+create_prod_sql_no_image = "INSERT INTO Product (name, description , price, weight, inventory, visible, category) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+update_prod_sql_no_image = "UPDATE Product SET name = %s, description=%s, price=%s, weight = %s, inventory = %s, visible = %s, category = %s WHERE sku = %s"
+update_prod_sql_with_image = "UPDATE Product SET name = %s, description=%s, price=%s, weight = %s, inventory = %s, visible = %s, category = %s, image=%s WHERE sku = %s"
 
-get_prod_sql = "SELECT sku, name, description, price, inventory, weight, visible FROM Product WHERE sku = %s"
+get_prod_sql = "SELECT sku, name, description, price, inventory, weight, visible, category FROM Product WHERE sku = %s"
 
 list_prod_sql = "SELECT * FROM Product"
 filter_prod_sql = "SELECT * FROM Product WHERE name LIKE %s"
@@ -46,13 +47,9 @@ def view_product(sku):
 
 
 @app.route("/product/<int:sku>/edit", methods=['post', 'get'])
+@requires_roles('admin')
 def edit_product(sku):
     """Prepares and edit product page with a get request by fetching the product details from the server"""
-
-    # Verify the current user is an admin
-    if "user_admin" not in session or not session["user_admin"]:
-        return render_template("error.html", msg="You are not authorized to view this page")
-
     # Setup the edit product page with auto filled values
     if request.method == 'GET':
         with get_db().cursor() as cursor:
@@ -61,7 +58,7 @@ def edit_product(sku):
             if not result:
                 return render_template("error.html", msg="Unable to retrieve product details")
             result["showInStore"] = "1" if result["visible"] == 1 else ''
-            return render_template("edit_product.html", data=result)
+            return render_template("edit_product.html", data=result, categories=fetch_categories())
 
     # Validate and submit
     data = request.form
@@ -93,13 +90,10 @@ def edit_product(sku):
 
 
 @app.route("/product/add", methods=['post', 'get'])
+@requires_roles('admin')
 def add_product():
-    # Verify the current user is an admin
-    if not "user_admin" in session or not session["user_admin"]:
-        return render_template("error.html", msg="You are not authorized to view this page")
-
     if request.method == 'GET':
-        return render_template("add_product.html", data={})
+        return render_template("add_product.html", data={}, categories=fetch_categories())
 
     args = prepare_product_insert_data(request.form)
 
@@ -174,6 +168,7 @@ def prepare_product_insert_data(data):
     args.append(float(data['weight']))
     args.append(inventory)
     args.append(visible)
+    args.append(data['category'])
 
     if app.debug:
         print(args)
@@ -198,4 +193,7 @@ def validate_product(data):
     if not data['price']:
         flash("Price is required")
         valid = False
+    if not data['category']:
+        valid = False
+        flash("Category is required")
     return valid

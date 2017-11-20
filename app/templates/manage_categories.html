@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <form action="{{ url_for("add_category") }}">
+        <input type="submit" value="Add"/>
+    </form>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Number of products</th>
+        </tr>
+        {% for cat in categories %}
+            <tr>
+                <td>{{ cat.id }}</td>
+                <td>{{ cat.name }}</td>
+                <td>{{ cat.productCount }}</td>
+                <td><a href="{{ url_for("edit_category", catID=cat.id) }}">edit</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

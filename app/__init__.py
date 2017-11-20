@@ -41,7 +41,6 @@ def close_db(error):
 
 
 @app.route('/', defaults={'path': ''})
-
 def main_page(path):
     return render_template("index.html")
 
@@ -65,4 +64,12 @@ def add_session():
     session["name"] = "klasjdfl"
     return flask.redirect("/session")
 
+
+@app.errorhandler(403)
+def not_authorized(e):
+    return render_template("403.html")
+
+
 from .product import *
+from .admin import *
+from .categories import *
