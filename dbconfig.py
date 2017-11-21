@@ -1,5 +1,0 @@
-db_host = '72.249.48.95'
-db_user = 'geaxyckp_nuclear_winners'
-db_password = '?SBus!}fLM^N'
-db = 'geaxyckp_nuclear_winners'
-db_charset = 'utf8mb4'
