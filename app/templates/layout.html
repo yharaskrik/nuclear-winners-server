@@ -21,19 +21,30 @@
                     </li>
                 </ul>
             {% else %}
-                <form method="get" action="{{ url_for("view_products") }}">
-                    <div class="input-field">
-                        <input type="text" placeholder="Search for products" name="search" value="{{ search }}">
-                        <input type="submit" value="Search">
+                <div class="row">
+                    <div class="col s5">
+                        <form method="get" action="{{ url_for("view_products") }}" id="makeSearch">
+                            <div class="input-field">
+                                <input type="text" placeholder="Search for products" name="search" value="{{ search }}">
+                            </div>
+                        </form>
                     </div>
-                </form>
-                <ul class="right">
-                    <li><a href="{{ url_for('views.view_account') }}">{{ session.user_name }}</a></li>
-                    <li><a href="{{ url_for('views.logout') }}"><i class="material-icons right">fingerprint</i>Log
-                        Out</a></li>
-                    <li><a href="{{ url_for('views.cart') }}"><i class="material-icons right">shopping-cart</i>Cart</a>
-                    </li>
-                </ul>
+                    <div class="col s2">
+                        <ul>
+                            <li><a href="#" id="searchButton"><i class="material-icons right">search</i>Search</a></li>
+                        </ul>
+                    </div>
+                    <div class="col s5">
+                        <ul class="right">
+                            <li><a href="{{ url_for('views.view_account') }}"><i class="material-icons right">accessibility</i> {{ session.user_name }}
+                            </a></li>
+                            <li><a href="{{ url_for('views.logout') }}"><i class="material-icons right">fingerprint</i>Log
+                                Out</a></li>
+                            <li><a href="{{ url_for('views.cart') }}"><i class="material-icons right">shopping-cart</i>Cart</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             {% endif %}
         </div>
     </nav>
@@ -57,5 +68,11 @@
         {% block body %}{% endblock %}
     </div>
 </div>
+
+<script>
+    document.getElementById("searchButton").onclick = function () {
+        document.getElementById("makeSearch").submit();
+    };
+</script>
 </body>
 </html>
