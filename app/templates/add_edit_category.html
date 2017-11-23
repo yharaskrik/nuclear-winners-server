@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <h1>{{ "Add" if request.endpoint == 'add_category' else "Edit" }} Category</h1>
+    <form action="{{ request.path }}" method="post">
+        <input type="hidden" name="id" value="{{ data.id }}">
+        <input type="text" name="name" value="{{ data.name }}" placeholder="Category name">
+        <input type="submit">
+    </form>
+{% endblock %}

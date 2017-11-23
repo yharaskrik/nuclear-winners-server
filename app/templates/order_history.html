@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+{% block body %}
+<table border=1>
+    <tr>
+        <td> ShipmentID</td>
+        <td> Status</td>
+        <td> Shipment Method</td>
+        <td> Payment Method</td>
+    </tr>
+    {% for order in orders %}
+        <tr>
+            <td> {{ order.shipmentID }} </td>
+            <td> {{ order.status }} </td>
+            <td> {{ order.shippingMethodID }} </td>
+            <td> {{ order.paymentMethodID }} </td>
+            <td colspan=3>
+                <table>
+                    <tr>
+                        <td> Product Name</td>
+                        <td> Quantity</td>
+                        <td> Total Price</td>
+                    </tr>
+                    {% for product in order.products %}
+                        <tr>
+                            <td> {{ product.name }} </td>
+                            <td> {{ product.quantity }} </td>
+                            <td> {{ product.total }} </td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td> Subtotal:</td>
+                        <td></td>
+                        <td> {{ order.subtotal }} </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}

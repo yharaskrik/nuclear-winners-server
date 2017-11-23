@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block body %}
+    <form enctype="multipart/form-data" method="post" action="/product/add">
+        Name: <input type="text" name="name" placeholder="Product Name" value="{{ data.name }}"/><br>
+        Description: <input type="text" name="description" placeholder="Description"
+                            value="{{ data.description }}"/><br>
+        Price: <input type="number" name="price" step="1" value="{{ data.price }}"/><br>
+        Weight: <input type="number" name="weight" step="any" value="{{ data.weight }}"><br>
+        Inventory: <input type="number" name="inventory" step="1" value="{{ data.inventory }}"><br>
+        Image: <input type="file" name="image" accept="image/*"/><br>
+
+        <label for="category">Category: </label>
+        <select name="category" title="Category">
+            {% for cat in categories %}
+                <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endfor %}
+        </select><br>
+        <label for="showInStore">Show in Store</label><input type="checkbox" name="showInStore" value="1">
+        <input type="submit" name="Submit`">
+    </form>
+{% endblock %}

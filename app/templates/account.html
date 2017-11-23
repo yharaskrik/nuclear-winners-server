@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+{% block body %}
+Name: {{ user.name }}<br>
+Faction: {{ user.faction }}<br>
+Address: {{ user.address }}<br>
+
+<form action='/account/orders'>
+    <input type='submit' value='Order History'/>
+
+</form>
+{% endblock %}

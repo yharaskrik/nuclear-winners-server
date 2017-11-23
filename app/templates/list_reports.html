@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% block body %}
+    <p>Unshipped Orders: {{ totalorders }}   Total Value: {{ totalsum }}</p>
+    <table border="1">
+        <tr>
+            <th>Shipment ID</th>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Shipping Method</th>
+            <th>Payment Method</th>
+            <th>Total</th>
+        </tr>
+    {%  for order in data %}
+        <tr>
+            <td><a href="{{ url_for('views.single_order',shipid=order['shipmentID']) }}">{{ order['shipmentID'] }}</a></td>
+            <td>{{ order['id'] }}</td>
+            <td>{{ order['name'] }}</td>
+            <td>{{ order['address'] }}</td>
+            <td>{{ order['methodName'] }}</td>
+            <td>{{ order['payment'] }}</td>
+            <td>{{ order['total'] }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+
+    <p>Finished Orders: {{ finishedorders }}   Total Value: {{ finishedtotal }}</p>
+    <table border="1">
+        <tr>
+            <th>Shipment ID</th>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Shipping Method</th>
+            <th>Payment Method</th>
+            <th>Total</th>
+        </tr>
+    {%  for order in data2 %}
+        <tr>
+            <td><a href="{{ url_for('views.single_order',shipid=order['shipmentID']) }}">{{ order['shipmentID'] }}</a>></td>
+            <td>{{ order['id'] }}</td>
+            <td>{{ order['name'] }}</td>
+            <td>{{ order['address'] }}</td>
+            <td>{{ order['methodName'] }}</td>
+            <td>{{ order['payment'] }}</td>
+            <td>{{ order['total'] }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}
