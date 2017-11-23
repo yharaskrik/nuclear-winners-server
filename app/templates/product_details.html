@@ -5,17 +5,17 @@
             <div class="card-image">
                 <img src="/product/{{ product.sku }}/image.jpg" style="height: 100%; align-content: center;"/>
             </div>
-            <span class="card-title">{{ product.name }}</span>
             <div class="card-stacked">
+            <span class="card-title">{{ product.name }}</span>
                 <div class="card-content">
                     <table>
                         <tr>
-                            <td>{% if product.inventory  and product.inventory > 0 %}{{ product.inventory }} in
+                            <td>{% if product.inventory  and product.inventory > 0 %}<i class="material-icons left">check_circle</i>{{ product.inventory }} in
                                 stock!{% else %}Out of
                                 stock!{% endif %}</td>
                             <td><i class="material-icons left">stars</i>{{ product.price }} caps</td>
 
-                            <td>{{ product.weight }} kg</td>
+                            <td><i class="material-icons left">schedule</i>{{ product.weight }} kg</td>
                         </tr>
                         <tr>
                             <td>{{ product.description }}</td>
