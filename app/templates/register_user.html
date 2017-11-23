@@ -1,13 +1,36 @@
 {% extends 'layout.html' %}
 {% block body %}
-<p>{{ errormsg }}</p>
-<form action="/user/register" method="post">
-Enter Name:<input type="text" name="name" size="50" maxlength="100" value="{{ data['name'] }}"><br>
-Enter Username:<input type="text" name="username" size="50" value="{{ data['username'] }}"><br>
-Enter Password:<input type="password" name="password" size="50" value="{{ data['password'] }}"><br>
-Confirm Password:<input type="password" name="confirmpassword" size="50" value="{{ data['confirmpassword'] }}"><br>
-Enter Address:<input type="text" name="address" size="50" maxlength="200" value="{{ data['address'] }}"><br>
-I am not a robot:<input type="checkbox" name="notrobot"><br>
-<input type="submit">
-</form>
+    <p>{{ errormsg }}</p>
+
+    <div class="row">
+        <div class="col s12">
+            <div class="card">
+                <form action="/user/register" method="post" id="registerForm">
+                    <div class="card-content">
+                        <span class="card-title"><i class="material-icons">fingerprint</i>Register</span>
+                        <input type="text" name="name" size="50" maxlength="100" value="{{ data['name'] }}"
+                               placeholder="Enter Name"><br>
+                        <input type="text" name="username" size="50" value="{{ data['username'] }}"
+                               placeholder="Enter Username"><br>
+                        <input type="password" name="password" size="50" value="{{ data['password'] }}"
+                               placeholder="Enter Password"><br>
+                        <input type="password" name="confirmpassword" size="50" value="{{ data['confirmpassword'] }}"
+                               placeholder="Confirm Password"><br>
+                        <input type="text" name="address" size="50" maxlength="200" value="{{ data['address'] }}"
+                               placeholder="Enter Address"><br>
+                        <p><input type="checkbox" name="notrobot" id="robotCheck"><label for="robotCheck">I am not a robot:</label></p>
+                    </div>
+                    <div class="card-action">
+                        <a href="{{ url_for('views.login') }}">Log in</a>
+                        <a href="#" id="submitButton">Register</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById("submitButton").onclick = function () {
+            document.getElementById("registerForm").submit();
+        }
+    </script>
 {% endblock %}
