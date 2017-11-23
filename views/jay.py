@@ -1,4 +1,5 @@
-from flask import jsonify
+from flask import jsonify, render_template
+
 try:
     import pymysql
     pymysql.install_as_MySQLdb()
@@ -22,9 +23,11 @@ connection = pymysql.connect(host='72.249.48.95',
 def index():
     # I created a customer table i the DB right now so yo guys could practice
     # it only has one record with one column 'id'
-    with connection.cursor() as cursor:
-        cursor.execute('select * from customer')
-        result = cursor.fetchone()
-        print(result)
+    cur = connection.cursor()
+    st = 'select * from %s'
+    st = st.format('customer')
+    print(st)
+    cur.execute('')
+
         # This will return the parsed json from the DB
-        return jsonify(result)
+    return render_template('index.html')
