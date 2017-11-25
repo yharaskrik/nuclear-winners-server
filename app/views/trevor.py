@@ -21,6 +21,7 @@ def register_user():
     try:
         with get_db().cursor() as cursor:
             cursor.execute(sql,[data['name'],data['password'],data['address'],data['username']])
+            #if the session does not have a created cart, then they have one created for them
             if not 'cart' in session:
                 cursor.execute('INSERT INTO Cart(userID) VALUES (%s)', cursor.lastrowid)
         return render_template('login.html')
