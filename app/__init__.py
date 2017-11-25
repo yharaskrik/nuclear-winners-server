@@ -1,6 +1,7 @@
-import flask
-from flask import Flask, g, render_template, session
+from flask import Flask, g, session
+
 import config
+import dbconfig
 
 try:
     import pymysql
@@ -8,18 +9,18 @@ try:
     pymysql.install_as_MySQLdb()
 except ImportError:
     pass
-import os
 
 app = Flask(__name__)
 app.config.from_object(config)
 
 
+
 def connect_db():
     """Connects to the applicaiton database"""
-    connection = pymysql.connect(host='72.249.48.95',
-                                 user='geaxyckp_nuclear_winter',
-                                 password='.EoP0Ea#i&,{',
-                                 db='geaxyckp_nuclear_winter',
+    connection = pymysql.connect(host=dbconfig.db_host,
+                                 user=dbconfig.db_user,
+                                 password=dbconfig.db_password,
+                                 db=dbconfig.db,
                                  charset='utf8mb4',
                                  cursorclass=pymysql.cursors.DictCursor)
     return connection
@@ -41,7 +42,6 @@ def close_db(error):
 
 
 @app.route('/', defaults={'path': ''})
-
 def main_page(path):
     return render_template("index.html")
 
@@ -64,3 +64,13 @@ def session_view():
 def add_session():
     session["name"] = "klasjdfl"
     return flask.redirect("/session")
+
+
+@app.errorhandler(403)
+def not_authorized(e):
+    return render_template("403.html")
+
+
+from .product import *
+from .admin import *
+from .categories import *

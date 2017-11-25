@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
-    <form enctype="multipart/form-data" method="post" action="/product/add">
+    <form enctype="multipart/form-data" method="post" action="/product/{{ data.sku }}/edit">
+        <input type="hidden" name="sku" value="{{ data.sku }}">
         Name: <input type="text" name="name" placeholder="Product Name" value="{{ data.name }}"/><br>
         Description: <input type="text" name="description" placeholder="Description"
                             value="{{ data.description }}"/><br>
@@ -8,14 +9,14 @@
         Weight: <input type="number" name="weight" step="any" value="{{ data.weight }}"><br>
         Inventory: <input type="number" name="inventory" step="1" value="{{ data.inventory }}"><br>
         Image: <input type="file" name="image" accept="image/*"/><br>
-
         <label for="category">Category: </label>
         <select name="category" title="Category">
             {% for cat in categories %}
-                <option value="{{ cat.id }}">{{ cat.name }}</option>
+                <option value="{{ cat.id }}" {{ "selected=\"selected\"" if cat.id == data.category }}>{{ cat.name }}</option>
             {% endfor %}
         </select><br>
-        <label for="showInStore">Show in Store</label><input type="checkbox" name="showInStore" value="1">
+        <label for="showInStore">Show in Store</label><input type="checkbox" name="showInStore"
+                                                             value="1" {{ "checked=checked" if data.showInStore == '1' else "" }} >
         <input type="submit" name="Submit`">
     </form>
 {% endblock %}
