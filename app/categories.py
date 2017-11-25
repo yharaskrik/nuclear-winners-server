@@ -56,6 +56,9 @@ def edit_category(catID):
     flash("Could not update the category name. Please try again")
     return render_template("add_edit_category.html", data=request.form)
 
+@app.route("/browse/")
+def view_categories():
+    pass
 
 def fetch_categories():
     """Fetched and returns all the categories from the database
