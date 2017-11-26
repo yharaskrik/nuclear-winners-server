@@ -13,7 +13,7 @@
         </tr>
     {%  for order in data %}
         <tr>
-            <td><a href="{{ url_for('views.single_order',shipid=order['shipmentID']) }}">{{ order['shipmentID'] }}</a></td>
+            <td><a href="{{ url_for('single_order',shipid=order['shipmentID']) }}">{{ order['shipmentID'] }}</a></td>
             <td>{{ order['id'] }}</td>
             <td>{{ order['name'] }}</td>
             <td>{{ order['address'] }}</td>
@@ -37,7 +37,7 @@
         </tr>
     {%  for order in data2 %}
         <tr>
-            <td><a href="{{ url_for('views.single_order',shipid=order['shipmentID']) }}">{{ order['shipmentID'] }}</a>></td>
+            <td><a href="{{ url_for('single_order',shipid=order['shipmentID']) }}">{{ order['shipmentID'] }}</a>></td>
             <td>{{ order['id'] }}</td>
             <td>{{ order['name'] }}</td>
             <td>{{ order['address'] }}</td>

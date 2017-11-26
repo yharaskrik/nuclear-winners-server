@@ -1,5 +1,8 @@
 {% extends "layout.html" %}
 {% block body %}
+    <form action="{{ url_for("order_options") }}" method="get">
+        <input type="submit" value="Checkout">
+    </form>
     <table border="1">
         {% for item in cart %}
             <tr>
@@ -23,4 +26,7 @@
 
         </tr>
     </table>
+    <form action="{{ url_for("order_options") }}" method="get">
+        <input type="submit" value="Checkout">
+    </form>
 {% endblock %}
