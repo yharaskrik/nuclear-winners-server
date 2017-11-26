@@ -1,6 +1,6 @@
 from flask import jsonify, render_template, session, request, redirect, flash
 
-from . import get_db, app
+from . import get_db, app, requires_roles
 
 
 @app.route('/cart')
@@ -78,6 +78,7 @@ def add_to_cart(pid):
     return redirect(request.referrer)
 
 @app.route('/checkcart/<int:id>')
+@requires_roles("admin")
 def check_cart(id):
     return str(validate_inventory(id))
 
