@@ -1,6 +1,6 @@
 from flask import jsonify, render_template, session, request, redirect, flash
 
-from . import get_db, app
+from . import get_db, app, requires_roles
 
 
 @app.route('/cart')
@@ -76,3 +76,25 @@ def add_to_cart(pid):
             get_db().commit()
     flash('Added to cart')
     return redirect(request.referrer)
+
+#TODO Delete this function after validate_inventory is used
+@app.route('/checkcart/<int:id>')
+@requires_roles("admin")
+def check_cart(id):
+    return str(validate_inventory(id))
+
+# validates inventory amount, returns true if all products have valid amounts, otherwise false
+# sku is an optional input.  Function only checks the single product
+def validate_inventory(cartId, sku = None):
+    sql = 'SELECT quantity, inventory FROM ProductInCart C, Product P WHERE C.sku = P.sku AND C.cartID = %s'
+    with get_db().cursor() as cursor:
+        if sku is None:
+            cursor.execute(sql, cartId)
+        else:
+            sql += ' AND P.sku = %s'
+            cursor.execute(sql, (cartId, sku))
+        products = cursor.fetchall()
+        for product in products:
+            if product['quantity'] > product['inventory']:
+                return False
+    return True
