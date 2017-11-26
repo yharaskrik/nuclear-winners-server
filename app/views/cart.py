@@ -1,8 +1,8 @@
-from flask import render_template, session, request, redirect, flash
+from flask import render_template, session, request, redirect, flash, current_app
 from pymysql import Error
 
 from app.util import is_logged_in, get_cart_id
-from . import get_db, app
+from . import get_db, app as app
 
 
 @app.route('/cart/')
@@ -34,7 +34,9 @@ def add_to_cart(pid):
     if not is_logged_in():
         add_product_to_session_cart(pid, quantity, inventory)
     else:
-        add_product_to_user_cart(pid, quantity, inventory)
+        if add_product_to_user_cart(pid, quantity, inventory):
+            flash("Added product to cart")
+
     return redirect(request.referrer)
 
 
@@ -163,7 +165,7 @@ def add_product_to_user_cart(sku, quantity, inventory):
             if not product_in_cart:
                 if quantity > inventory:
                     flash('Not enough product in stock')
-                    return
+                    return False
 
                 cursor.execute('INSERT INTO ProductInCart(cartID, sku, quantity) '
                                'VALUES (%s, %s, %s);',
@@ -179,13 +181,12 @@ def add_product_to_user_cart(sku, quantity, inventory):
                                'WHERE cartID = %s AND sku = %s',
                                (quantity, cart_id, sku))
             get_db().commit()
-            flash("Added product to cart")
-            return
+            return True
 
     except Error as e:
-        app.logger.error(e)
+        current_app.logger.error(e)
         flash("Unable to add product to cart")
-        return
+        return False
 
 
 def get_inventory_for_product(sku):
@@ -205,7 +206,7 @@ def get_inventory_for_product(sku):
                 return row["inventory"]
             return 0
     except Exception as e:
-        app.logger.error(e)
+        current_app.logger.error(e)
         return 0
 
 
@@ -222,7 +223,7 @@ def delete_from_user_cart(sku):
             get_db().commit()
             return True
     except Exception as e:
-        app.logger.error(e)
+        current_app.logger.error(e)
         return False
 
 
@@ -272,7 +273,7 @@ def update_user_cart(sku, quantity):
             get_db().commit()
             return True
     except Error as e:
-        app.logger.error(e)
+        current_app.logger.error(e)
         return False
 
 
@@ -313,3 +314,20 @@ def get_session_cart():
     if "cart" not in session:
         session["cart"] = {}
     return session["cart"]
+
+
+def transfer_session_cart_to_user_cart():
+    """Check if the user has a session cart, if so transfers the products into the user's database cart"""
+    session_cart = get_session_cart()
+
+    if not session_cart:
+        current_app.logger.debug("No session cart to transfer")
+        return
+
+    for sku in session_cart:
+        if not sku == "total":
+            add_product_to_user_cart(sku, session_cart[sku], get_inventory_for_product(sku))
+
+    # Remove the cart
+    session.pop("cart")
+    current_app.logger.debug("Transferred session cart")

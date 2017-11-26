@@ -7,6 +7,7 @@ from werkzeug.security import check_password_hash
 from app.util import is_user_admin, is_logged_in, set_user_data, clear_user_data
 from app.util import set_cart_id
 from . import app, get_db
+from .cart import transfer_session_cart_to_user_cart
 
 
 @app.route('/user/login', methods=['GET', 'POST'])
@@ -33,8 +34,7 @@ def login():
             # Add the user data into the session
             set_user_data(u["id"], u["name"], u["username"], u['accountType'] == 1)
             check_and_cache_cart_id(u["id"])
-
-            print(request.args)
+            transfer_session_cart_to_user_cart()
             return flask.redirect(next_link)
     flash("Invalid username or password")
     return redirect(request.referrer)
