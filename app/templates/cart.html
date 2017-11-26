@@ -1,53 +1,55 @@
 {% extends "layout.html" %}
 {% block body %}
-    <form action="{{ url_for("order_options") }}" method="get">
-        <input type="submit" value="Checkout">
-    </form>
-    <table border="1">
-        {% for item in cart %}
-            <tr>
-                <td><img src="{{ url_for('product_picture',sku=item.sku) }}" width="50"></td>
-                <td><a href="{{ url_for('view_product', sku=item.sku) }}">{{ item.name }}</a></td>
-                <td>
-                    <form method="get" action="{{ url_for("update_cart", pid=item.sku) }}">
-                        <input min='1' type="number" name="quantity" value="{{ item.quantity }}">
-                        <input type="submit" value="Submit">
-                    </form>
-                </td>
-                <td>{{ item.price }} caps</td>
-                <td>{{ item.total }}</td>
-                <td><a href="{{ url_for('add_to_cart', pid=item.sku) }}">+</a></td>
-                <td><a href="{{ url_for('delete_from_cart', pid=item.sku) }}">X</a></td>
-
-            </tr>
-            <div class="row">
-                <div class="card">
+    {% for item in cart %}
+        <div class="row">
+            <div class="col s12">
+                <div class="card horizontal">
                     <div class="card-image">
                         <a href="{{ url_for('view_product', sku=item.sku) }}"><img
-                                src="{{ url_for('product_picture',sku=item.sku) }}" width="50"></a>
+                                src="{{ url_for('product_picture',sku=item.sku) }}" width="50px"></a>
                     </div>
-                    <span class="card-title"><a class="center-align" style="display: block;"
-                                                href="{{ url_for('view_product', sku=item.sku) }}">{{ item.name }}</a></span>
+                    <span class="card-title"><a href="{{ url_for('view_product', sku=item.sku) }}">{{ item.name }}</a></span>
 
-                    <div class="card-content">
-                        <a href="{{ url_for('view_product', sku=item.sku) }}" style="display:block; color: #000000;">
-                            <p>
-                                {{ item.description }}<br>
-                            </p>
-                            <p class="left-align">
-                                <i class="material-icons left">stars</i>{{ item.price }} caps
-                            </p>
-                        </a>
+
+                    <div class="card-stacked">
+                        <div class="card-content">
+                            <ul class="collection">
+                                {% if item.description %}
+                                    <li class="collection-item">{{ item.description }}</li>
+                                {% endif %}
+                                <li class="collection-item">Quantity:
+                                    <form method="get" action="{{ url_for("update_cart", pid=item.sku) }}">
+                                        <input min='1' type="number" name="quantity" value="{{ item.quantity }}">
+                                        <input type="submit" value="Update">
+                                    </form>
+
+                                </li>
+                                <li class="collection-item"><i class="material-icons right">stars</i>{{ item.price }}
+                                    caps
+                                </li>
+
+                                <li class="collection-item">Total Caps: {{ item.total }}</li>
+                            </ul>
+                        </div>
+                        <div class="card-action">
+                            <a href="{{ url_for('delete_from_cart', pid=item.sku) }}">Remove</a>
+                        </div>
                     </div>
+
                 </div>
             </div>
-        {% endfor %}
-        <tr>
-            <td align="right" colspan='5'>total: {{ subtotal }} caps</td>
-
-        </tr>
-    </table>
-    <form action="{{ url_for("order_options") }}" method="get">
-        <input type="submit" value="Checkout">
-    </form>
+        </div>
+    {% endfor %}
+    <div class="row">
+        <div class="col s12">
+            <div class="card center-align">
+                <div class="card-content">
+                    Total: {{ subtotal }} caps
+                </div>
+                <div class="card-action">
+                    <a href="{{ url_for("order_options") }}">Checkout</a>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
