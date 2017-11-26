@@ -2,7 +2,7 @@
 {% block body %}
     <div class="row">
         <div class="col s10">
-            <form method="post" action="{{ url_for("place_order") }}">
+            <form id="my_form" method="post" action="{{ url_for("place_order") }}">
                 <div class="card">
                     <div>
                         <fieldset>
@@ -100,7 +100,7 @@
                         </table>
                     </div>
                     <div class="card-action">
-                        <input type="submit" value="Place Order">
+                        <a href="javascript:{}" onclick="document.getElementById('my_form').submit();">Place Order</a>
                     </div>
                 </div>
             </form>

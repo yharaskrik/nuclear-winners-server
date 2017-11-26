@@ -75,8 +75,6 @@ def place_order():
     try:
         with get_db().cursor() as cursor:
             # Create the order
-            print(data["shippingMethod"])
-            print(data["paymentMethod"])
             cursor.execute(insert_order, (get_user_id(), data["shippingMethod"], data["paymentMethod"]))
             order_id = cursor.lastrowid
 
