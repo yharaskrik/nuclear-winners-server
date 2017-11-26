@@ -1,17 +1,26 @@
 {% extends "layout.html" %}
 {% block body %}
-<table border="1">
-    {% for item in cart %}
+    <table border="1">
+        {% for item in cart %}
+            <tr>
+                <td><img src="{{ url_for('product_picture',sku=item.sku) }}" width="50"></td>
+                <td><a href="{{ url_for('view_product', sku=item.sku) }}">{{ item.name }}</a></td>
+                <td>
+                    <form method="get" action="{{ url_for("views.update_cart", pid=item.sku) }}">
+                        <input min='1' type="number" name="quantity" value="{{ item.quantity }}">
+                        <input type="submit" value="Submit">
+                    </form>
+                </td>
+                <td>{{ item.price }} caps</td>
+                <td>{{ item.total }}</td>
+                <td><a href="{{ url_for('views.add_to_cart', pid=item.sku) }}">+</a></td>
+                <td><a href="{{ url_for('views.delete_from_cart', pid=item.sku) }}">X</a></td>
+
+            </tr>
+        {% endfor %}
         <tr>
-            <td><img src="{{ url_for('product_picture',sku=item.sku) }}" width="50"></td>
-            <td><a href="{{ url_for('view_product', sku=item.sku) }}">{{ item.name }}</a></td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.price }} caps</td>
-            <td>{{ item.total }}</td>
+            <td align="right" colspan='5'>total: {{ subtotal }} caps</td>
+
         </tr>
-    {% endfor %}
-    <tr>
-        <td align="right" colspan = '5'>total: {{ subtotal }}</td>
-    </tr>
-</table>
+    </table>
 {% endblock %}

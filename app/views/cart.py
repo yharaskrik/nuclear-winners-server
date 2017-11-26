@@ -1,4 +1,4 @@
-from flask import jsonify, render_template, session, request, redirect, flash
+from flask import render_template, session, request, redirect, flash
 
 from . import get_db, app, requires_roles
 
@@ -6,10 +6,12 @@ from . import get_db, app, requires_roles
 @app.route('/cart')
 def cart():
     if not session['logged_in']:
+        if 'cart' not in session:
+            session['cart'] = {}
+        # call method to display the cart, using the session cart data
         if not session['cart']:
-            return render_template('no_account.html')
+            return render_template('no_cart.html')
         else:
-            # call method to display the cart, using the session cart data
             ids = session['cart'].keys()
             sql = "SELECT sku, name, price FROM Product WHERE sku IN (%s)" % ','.join(["%s"] * len(ids))
             with get_db().cursor() as cursor:
@@ -32,11 +34,14 @@ def cart():
                            'FROM ProductInCart AS PC, Product AS P WHERE '
                            'PC.sku = P.sku AND PC.cartID = %s', cart_id)
             cart = cursor.fetchall()
-            subtotal = 0
-            # add up the subtotal
-            for item in cart:
-                subtotal += item['total']
-            return render_template('cart.html', cart=cart, subtotal=subtotal)
+            if not cart:
+                return render_template('no_cart.html')
+            else:
+                subtotal = 0
+                # add up the subtotal
+                for item in cart:
+                    subtotal += item['total']
+                return render_template('cart.html', cart=cart, subtotal=subtotal)
 
 
 @app.route('/cart/add/<int:pid>/')
@@ -64,8 +69,8 @@ def add_to_cart(pid):
             # If they don't have the item in their cart, add it
             if not products_in_cart:
                 i = cursor.execute('INSERT INTO ProductInCart(cartID, sku, quantity) '
-                               'VALUES ((SELECT cartID FROM Cart WHERE userID = %s), %s, %s);',
-                               (session['user_id'], pid, quantity))
+                                   'VALUES ((SELECT cartID FROM Cart WHERE userID = %s), %s, %s);',
+                                   (session['user_id'], pid, quantity))
                 print(cursor._last_executed)
                 print("Rows updated: " + str(i))
             # If they do have the item in their cart, update the amount
@@ -77,24 +82,37 @@ def add_to_cart(pid):
     flash('Added to cart')
     return redirect(request.referrer)
 
-#TODO Delete this function after validate_inventory is used
-@app.route('/checkcart/<int:id>')
-@requires_roles("admin")
-def check_cart(id):
-    return str(validate_inventory(id))
 
-# validates inventory amount, returns true if all products have valid amounts, otherwise false
-# sku is an optional input.  Function only checks the single product
-def validate_inventory(cartId, sku = None):
-    sql = 'SELECT quantity, inventory FROM ProductInCart C, Product P WHERE C.sku = P.sku AND C.cartID = %s'
-    with get_db().cursor() as cursor:
-        if sku is None:
-            cursor.execute(sql, cartId)
-        else:
-            sql += ' AND P.sku = %s'
-            cursor.execute(sql, (cartId, sku))
-        products = cursor.fetchall()
-        for product in products:
-            if product['quantity'] > product['inventory']:
-                return False
-    return True
+@app.route('/cart/delete/<int:pid>/')
+def delete_from_cart(pid):
+    if not session['logged_in']:
+        session['cart'].pop(str(pid), None)
+    else:
+        with get_db().cursor() as cursor:
+            cursor.execute('DELETE FROM ProductInCart '
+                           'WHERE sku = %s AND cartID = (SELECT cartID FROM Cart WHERE userID = %s)',
+                           (pid, session['user_id']))
+            get_db().commit()
+    flash('Removed from cart')
+    return redirect(request.referrer)
+
+
+@app.route('/cart/update/<int:pid>/')
+def update_cart(pid):
+    if 'quantity' not in request.args:
+        flash('Quantity not specified')
+        return redirect(request.referrer)
+
+    quantity = int(request.args['quantity'])
+    if not session['logged_in']:
+        session['cart'][str(pid)] = quantity
+        flash('Updated')
+        return redirect(request.referrer)
+    else:
+        with get_db().cursor() as cursor:
+            cursor.execute('UPDATE ProductInCart SET quantity = %s '
+                           'WHERE sku = %s AND cartID = (SELECT cartID FROM Cart WHERE userID = %s)',
+                           (quantity, pid, session['user_id']))
+            get_db().commit()
+            flash('Updated')
+            return redirect(request.referrer)

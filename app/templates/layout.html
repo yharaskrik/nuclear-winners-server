@@ -18,9 +18,9 @@
             {% else %}
                 <a href="{{ url_for('views.view_account') }}">{{ session.user_name }}</a>
                 <a href="{{ url_for('views.logout') }}">log out</a>
-
-                </div>
-            {% endif %}
+                <a href="{{ url_for('views.cart') }}">cart</a>
+            </div>
+        {% endif %}
     </div>
 
     <div class="content" style="clear: both">
