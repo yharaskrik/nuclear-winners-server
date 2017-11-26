@@ -77,11 +77,14 @@ def add_to_cart(pid):
     flash('Added to cart')
     return redirect(request.referrer)
 
+#TODO Delete this function after validate_inventory is used
 @app.route('/checkcart/<int:id>')
 @requires_roles("admin")
 def check_cart(id):
     return str(validate_inventory(id))
 
+# validates inventory amount, returns true if all products have valid amounts, otherwise false
+# sku is an optional input.  Function only checks the single product
 def validate_inventory(cartId, sku = None):
     sql = 'SELECT quantity, inventory FROM ProductInCart C, Product P WHERE C.sku = P.sku AND C.cartID = %s'
     with get_db().cursor() as cursor:
