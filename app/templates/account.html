@@ -1,11 +1,22 @@
 {% extends 'layout.html' %}
 {% block body %}
-Name: {{ user.name }}<br>
-Faction: {{ user.faction }}<br>
-Address: {{ user.address }}<br>
+    <div class="row" style="width: 50%;">
+        <div class="col s12 m12">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">{{ user.name }}</span>
+                    <p>Faction: {{ user.faction }}<br>Address: {{ user.address }}<br><br></p>
 
-<form action='/account/orders'>
-    <input type='submit' value='Order History'/>
-
-</form>
+                        {% for mutation in mutations %}
+                            <div class="chip">
+                                {{ mutation.name }}
+                            </div>
+                        {% endfor %}
+                </div>
+          <div class="card-action">
+                    <a href="/account/orders">Order History</a>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

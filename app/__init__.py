@@ -42,8 +42,8 @@ def close_db(error):
 
 @app.route('/', defaults={'path': ''})
 def main_page(path):
-    return render_template("index.html")
-
+    # return render_template("product_list.html")
+    return redirect(url_for('view_products'))
 
 from app.views import views as views
 

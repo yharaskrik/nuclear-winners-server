@@ -15,7 +15,13 @@ def view_account():
         else:
             cursor.execute(sql, session['user_id'])
             user = cursor.fetchone()
-            return render_template('account.html', user=user)
+
+            cursor.execute('SELECT * FROM UserMutation INNER JOIN Mutation ON UserMutation.mutationID = Mutation.id WHERE userID = %s', session['user_id'])
+            mutatiions = cursor.fetchall()
+            for mutation in mutatiions:
+                print(mutation)
+            print(user)
+            return render_template('account.html', user=user, mutations=mutatiions)
 
 
 @app.route('/account/orders')

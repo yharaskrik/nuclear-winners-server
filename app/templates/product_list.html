@@ -21,7 +21,7 @@
                     </a>
                 </div>
                 <div class="card-action green darken-4">
-                    <a style="display: block;" href="#" id="addToCart">
+                    <a style="display: block;" href="{{ url_for('add_to_cart', pid = item.sku) }}" id="addToCart">
                         <i class="material-icons">add</i>Add to Cart</a>
                 </div>
             </div>

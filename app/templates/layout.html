@@ -6,6 +6,7 @@
 
     <!-- Compiled and minified CSS -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+{#    <link href="../../static/css/styles.css" rel="stylesheet">#}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
@@ -17,6 +18,11 @@
         nav {
             background-color: #0C833D;
         }
+        input.nav-search {
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
@@ -26,14 +32,14 @@
             {% if not session.logged_in %}
                 <ul class="right hide-on-med-and-down">
                     <li>
-                        <a href="{{ url_for('views.login') }}"><i class="material-icons right">fingerprint</i>Log In</a>
+                        <a href="{{ url_for('login') }}"><i class="material-icons right">fingerprint</i>Log In</a>
                     </li>
                 </ul>
             {% else %}
                 <div class="row">
                     <div class="col s5">
                         <form method="get" action="{{ url_for("view_products") }}" id="makeSearch">
-                            <div class="input-field">
+                            <div class="input-field nav-search">
                                 <input type="text" placeholder="Search for products" name="search" value="{{ search }}">
                             </div>
                         </form>
@@ -45,11 +51,11 @@
                     </div>
                     <div class="col s5">
                         <ul class="right">
-                            <li><a href="{{ url_for('views.view_account') }}"><i class="material-icons right">accessibility</i> {{ session.user_name }}
+                            <li><a href="{{ url_for('view_account') }}"><i class="material-icons right">accessibility</i> {{ session.user_name }}
                             </a></li>
-                            <li><a href="{{ url_for('views.logout') }}"><i class="material-icons right">fingerprint</i>Log
+                            <li><a href="{{ url_for('logout') }}"><i class="material-icons right">fingerprint</i>Log
                                 Out</a></li>
-                            <li><a href="{{ url_for('views.cart') }}"><i class="material-icons right">shopping-cart</i>Cart</a>
+                            <li><a href="{{ url_for('cart') }}"><i class="material-icons right">shopping-cart</i>Cart</a>
                             </li>
                         </ul>
                     </div>
