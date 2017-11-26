@@ -1,5 +1,6 @@
 import flask
 from flask import render_template, session, url_for, abort
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from . import app, get_db
 
@@ -9,14 +10,16 @@ def login():
     if flask.request.method == 'GET':
         return render_template("login.html")
 
-    sql = "SELECT * FROM User WHERE username=%s and pass=%s;"
+    sql = "SELECT * FROM User WHERE username=%s;"
 
     data = flask.request.form
 
     with get_db().cursor() as cursor:
-        cursor.execute(sql, (data["username"], data["password"]))
+        cursor.execute(sql, data["username"])
         u = cursor.fetchone()
         if u:
+            if not check_password_hash(u['pass'], data['password']):
+                return render_template("login.html", errormsg="Invalid username or password")
             session["user_id"] = u["id"]
             session["user_name"] = u["name"]
             session["user_username"] = u["username"]

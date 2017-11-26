@@ -4,4 +4,5 @@
     {% if session.user_admin %}
         <h1><a href="{{ url_for("admin") }}">Admin</a></h1>
     {% endif %}
+    <a href="{{ url_for('view_categories') }}">List Categories</a>
 {% endblock %}
