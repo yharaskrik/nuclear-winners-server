@@ -106,6 +106,8 @@ def update_cart(pid):
     quantity = int(request.args['quantity'])
     if not session['logged_in']:
         session['cart'][str(pid)] = quantity
+        flash('Updated')
+        return redirect(request.referrer)
     else:
         with get_db().cursor() as cursor:
             cursor.execute('UPDATE ProductInCart SET quantity = %s '
