@@ -1,6 +1,6 @@
 from flask import render_template, session, request, redirect, flash
 
-from . import get_db, app
+from . import get_db, app, requires_roles
 
 
 @app.route('/cart')
@@ -22,7 +22,9 @@ def cart():
                     item['quantity'] = session['cart'][str(item['sku'])]
                     item['total'] = item['price'] * item['quantity']
                     subtotal += item['total']
-        return render_template('cart.html', cart=cart, subtotal=subtotal)
+            return render_template('cart.html', cart=cart, subtotal=subtotal)
+
+
     else:
         # call method to display the cart, using the database data
         with get_db().cursor() as cursor:
