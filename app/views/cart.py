@@ -46,6 +46,9 @@ def cart():
 
 @app.route('/cart/add/<int:pid>/')
 def add_to_cart(pid):
+    with get_db().cursor() as cursor:
+        cursor.execute('SELECT inventory FROM Product WHERE sku = %s',pid)
+        u = cursor.fetchone()
     # If there is no quantity specified by the call, it defaults to one
     quantity = 1
     if quantity in request.args:
@@ -55,19 +58,28 @@ def add_to_cart(pid):
         if 'cart' not in session:
             session['cart'] = {}
         if str(pid) not in session['cart']:
+            if quantity > u['inventory']:
+                flash('No more product in stock')
+                return redirect(request.referrer)
             session['cart'][str(pid)] = quantity
         else:
+            if session['cart'][str(pid)] + quantity > u['inventory']:
+                flash('No more product in stock')
+                return redirect(request.referrer)
             session['cart'][str(pid)] += quantity
     else:
         # Check if they already have the item in their cart
         with get_db().cursor() as cursor:
             print(session['user_id'])
-            cursor.execute('SELECT sku FROM ProductInCart AS PC, Cart AS C '
+            cursor.execute('SELECT sku , C.cartID FROM ProductInCart AS PC, Cart AS C '
                            'WHERE C.cartID = PC.cartID AND C.userID = %s AND sku = %s', (session['user_id'], pid))
             products_in_cart = cursor.fetchall()
             print(str(products_in_cart))
             # If they don't have the item in their cart, add it
             if not products_in_cart:
+                if quantity > u['inventory']:
+                    flash('No more product in stock')
+                    return redirect(request.referrer)
                 i = cursor.execute('INSERT INTO ProductInCart(cartID, sku, quantity) '
                                    'VALUES ((SELECT cartID FROM Cart WHERE userID = %s), %s, %s);',
                                    (session['user_id'], pid, quantity))
@@ -75,6 +87,9 @@ def add_to_cart(pid):
                 print("Rows updated: " + str(i))
             # If they do have the item in their cart, update the amount
             else:
+                if not validate_inventory(products_in_cart['cartId'],pid,quantity):
+                    flash('No more product in stock')
+                    return redirect(request.referrer)
                 cursor.execute('UPDATE ProductInCart SET quantity = quantity + %s '
                                'WHERE cartID = (SELECT cartID FROM Cart WHERE userID = %s) AND sku = %s',
                                (quantity, session['user_id'], pid))
@@ -105,14 +120,44 @@ def update_cart(pid):
 
     quantity = int(request.args['quantity'])
     if not session['logged_in']:
-        session['cart'][str(pid)] = quantity
-        flash('Updated')
+        with get_db().cursor() as cursor:
+            cursor.execute('SELECT inventory FROM Product WHERE sku = %s', pid)
+            u = cursor.fetchone()
+            if quantity > u['inventory']:
+                flash('No more product in stock')
+                return redirect(request.referrer)
+            session['cart'][str(pid)] = quantity
+            flash('Updated')
         return redirect(request.referrer)
     else:
         with get_db().cursor() as cursor:
+            cursor.execute('SELECT cartID FROM Cart WHERE userID = %s', (session['user_id']))
+            u = cursor.fetchone()
+            if not validate_inventory(u['cartID'], pid, quantity):
+                flash('No more product in stock')
+                return redirect(request.referrer)
             cursor.execute('UPDATE ProductInCart SET quantity = %s '
                            'WHERE sku = %s AND cartID = (SELECT cartID FROM Cart WHERE userID = %s)',
                            (quantity, pid, session['user_id']))
             get_db().commit()
             flash('Updated')
             return redirect(request.referrer)
+
+
+def validate_inventory(cartId, sku=None, qty=None):
+    sql = 'SELECT quantity, inventory FROM ProductInCart C, Product P WHERE C.sku = P.sku AND C.cartID = %s'
+    with get_db().cursor() as cursor:
+        if sku is None:
+            cursor.execute(sql, cartId)
+        else:
+            sql += ' AND P.sku = %s'
+            cursor.execute(sql, (cartId, sku))
+        products = cursor.fetchall()
+        for product in products:
+            if qty is None:
+                if product['quantity'] > product['inventory']:
+                    return False
+            else:
+                if qty > product['inventory']:
+                    return False
+    return True
