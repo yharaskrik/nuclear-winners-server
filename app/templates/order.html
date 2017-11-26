@@ -37,14 +37,17 @@
                     <div>
                         <fieldset>
                             <legend>Payment Method</legend>
-                            {% for method in payment %}
-                                <tr>
-                                    <td>
-                                        <input type="radio" name="paymentMethod"
-                                               value="{{ method.methodID }}" {{ 'checked="checked"' if method.methodID|string == data.paymentMethod }}>{{ method.name }}
-                                    </td>
-                                </tr>
-                            {% endfor %}
+                            <table>
+                                {% for method in payment %}
+                                    <tr>
+                                        <td>
+                                            <input class="with-gap" type="radio" name="paymentMethod"
+                                                   value="{{ method.methodID }}" id="{{ method.methodID }}p">
+                                            <label for="{{ method.methodID }}p">{{ method.name }}</label>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
                         </fieldset>
                     </div>
 
@@ -56,21 +59,11 @@
 
                                 {% for method in shipping %}
                                     <tr>
-                                        {#                                    <p>#}
-                                        {#                                            <input type="hidden" id="shippingPrice{{ method.methodID }}"#}
-                                        {#                                                   value="{{ method.price }}">#}
-                                        {#                                            <input type="radio" name="shippingMethod" onclick="updateTotals()"#}
-                                        {#                                                   value="{{ method.methodID }}" {{ 'checked="checked"' if method.methodID|string == data.shippingMethod }} >{{ method.methodName }}#}
-                                        {##}
-                                        {#                                        {{ method.price if method.price > 0 else "Free!" }}#}
-                                        {#                                    </p>#}
-                                        <td>
-
-                                        </td>
                                         <td>
                                             <input class="with-gap" name="shippingMethod" type="radio"
-                                                   id="{{ method.methodID }}" value="{{ method.price }}" onclick="updateTotals(this)"/>
-                                            <label for="{{ method.methodID }}">{{ method.methodName }}</label>
+                                                   id="{{ method.methodID }}s" value="{{ method.methodID }}"
+                                                   onclick="updateTotals()"/>
+                                            <label for="{{ method.methodID }}s">{{ method.methodName }}</label>
                                         </td>
                                         <td>
                                             {{ method.price if method.price > 0 else "Free!" }}
@@ -78,7 +71,6 @@
                                     </tr>
                                 {% endfor %}
                             </table>
-
                         </fieldset>
                     </div>
 
@@ -115,8 +107,6 @@
 
         </div>
     </div>
-    </div>
-    </div>
     <script>
         var tax = {{ tax }};
         var cartTotal = {{ total }}
@@ -125,10 +115,7 @@
                 var shippingPrice = 0;
                 if (currentShipping) {
                     var shippingId = currentShipping.id;
-                    console.log(shippingId);
-{#                    shippingPrice = parseInt(document.getElementById("shippingPrice" + shippingId).value);#}
                     shippingPrice = parseInt(currentShipping.value);
-                    console.log(shippingPrice);
                 }
                 document.getElementById("shippingTotal").innerHTML = shippingPrice;
 
