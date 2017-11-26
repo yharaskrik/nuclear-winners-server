@@ -1,8 +1,8 @@
 {% extends 'layout.html' %}
 {% block body %}
     <div class="error">{{ errormsg }}</div>
-    <form action="/user/login" method="post">
-        <input type="text" name="username" placeholder="Username" /><br>
+    <form action="{{ url_for("views.login", next=next) }}" method="post">
+        <input type="text" name="username" placeholder="Username"/><br>
         <input type="password" name="password" placeholder="Password"/> <br>
         <input type="submit" value="Login">
     </form>
