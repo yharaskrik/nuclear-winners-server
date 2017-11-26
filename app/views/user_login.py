@@ -1,10 +1,10 @@
 from functools import wraps
 
 import flask
-from flask import render_template, session, url_for, abort, request, flash, redirect
+from flask import render_template, url_for, abort, request, flash, redirect
 from werkzeug.security import check_password_hash
 
-from app.util import is_user_admin, is_logged_in, clear_cart_id, set_user_data
+from app.util import is_user_admin, is_logged_in, set_user_data, clear_user_data
 from app.util import set_cart_id
 from . import app, get_db
 
@@ -61,12 +61,7 @@ def check_and_cache_cart_id(user_id):
 
 @app.route("/user/logout")
 def logout():
-    del (session["user_id"])
-    del (session["user_name"])
-    del (session["user_username"])
-    clear_cart_id()
-    session['user_admin'] = False
-    session["logged_in"] = False
+    clear_user_data()
     return flask.redirect("/")
 
 
