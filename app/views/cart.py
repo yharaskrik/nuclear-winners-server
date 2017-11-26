@@ -71,3 +71,21 @@ def add_to_cart(pid):
                                (quantity, session['user_id'], pid))
     flash('Added to cart')
     return redirect(request.referrer)
+
+@app.route('/checkcart/<int:id>')
+def check_cart(id):
+    return str(validate_inventory(id))
+
+def validate_inventory(cartId, sku = None):
+    sql = 'SELECT quantity, inventory FROM ProductInCart C, Product P WHERE C.sku = P.sku AND C.cartID = %s'
+    with get_db().cursor() as cursor:
+        if sku is None:
+            cursor.execute(sql, cartId)
+        else:
+            sql += ' AND P.sku = %s'
+            cursor.execute(sql, (cartId, sku))
+        products = cursor.fetchall()
+        for product in products:
+            if product['quantity'] > product['inventory']:
+                return False
+    return True
