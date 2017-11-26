@@ -19,7 +19,7 @@ filter_prod_sql = "SELECT * FROM Product WHERE name LIKE %s"
 
 
 @app.route("/products/", methods=['GET'])
-@app.route("/products/<int:cid>/", methods=['GET'])
+@app.route("/products/category/<int:cid>", methods=['GET'])
 def view_products(cid=None):
     sql = list_prod_sql
 
