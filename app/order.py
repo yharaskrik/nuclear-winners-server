@@ -1,11 +1,11 @@
-from flask import render_template, request, flash, url_for, redirect
+from flask import render_template, request, flash, url_for, redirect, abort
 
 from config import TAX_RATE
 from . import app
 from . import get_db
 from .payment_methods import get_payment_methods
 from .shipping import get_shipping_methods, get_shipping_method_price
-from .util import get_user_id
+from .util import get_user_id, is_user_admin
 from .views.user_login import requires_roles
 
 
@@ -34,9 +34,19 @@ def order_options(data=None):
 @app.route("/order/", methods=['POST'])
 @requires_roles("user")
 def place_order():
+    """ Places the order by doing the following:
+
+    Adds a record for the order in the Shipment database with the shipping method, payment method
+    Adds each product into the shipped product and calculates the total.
+    Updates the product inventory for each product
+    Adds the shipping price to the total
+    Adds the tax to the total
+    Updates the shipment row in the database with the total.
+    Clears the user's cart
+    """
+
     # Ensure everything is set.
     data = request.form
-    print(str(data))
     valid = True
     if "paymentMethod" not in data or not data["paymentMethod"]:
         flash("Payment method is required")
@@ -45,6 +55,7 @@ def place_order():
         valid = False
         flash("Shipping method is required")
 
+    # Get the cart
     cart = get_cart()
 
     if not cart:
@@ -59,25 +70,26 @@ def place_order():
 
     # Validate Product supply
     # TODO Add trevors validate inventory
-    orderId = 0
+
+    order_id = 0
     try:
         with get_db().cursor() as cursor:
             # Create the order
             cursor.execute(insert_order, (get_user_id(), data["shippingMethod"], data["paymentMethod"]))
-            orderId = cursor.lastrowid
+            order_id = cursor.lastrowid
 
             total = 0
             for item in cart:
                 # Add item to ordered product
-                cursor.execute(insert_ordered_product, (orderId, item["sku"], item["quantity"], item["price"]))
+                cursor.execute(insert_ordered_product, (order_id, item["sku"], item["quantity"], item["price"]))
                 # Update inventory
                 cursor.execute(update_inventory, (item["quantity"], item["sku"]))
                 total += item['quantity'] * item["price"]
 
-            shippingPrice = get_shipping_method_price(data["shippingMethod"])
-            total += shippingPrice
+            shipping_price = get_shipping_method_price(data["shippingMethod"])
+            total += shipping_price
             tax = int(round(total * TAX_RATE))
-            cursor.execute(update_order_total, (total + tax, orderId))
+            cursor.execute(update_order_total, (total + tax, order_id))
             cursor.execute(clear_cart, cart_id)
             get_db().commit()
 
@@ -87,7 +99,7 @@ def place_order():
         app.logger.error(e)
         flash("Unable to place order. Please try again")
         return order_options(data)
-    return redirect(url_for("single_order", shipid=orderId))
+    return redirect(url_for("single_order", shipid=order_id))
 
 
 insert_order = "INSERT INTO Shipment (status, userID, shippingMethodID, paymentMethodID, total) " \
@@ -115,15 +127,35 @@ def get_cart():
     return
 
 
-@app.route('/admin/reports/order/<int:shipid>')
+@app.route('/order/details/<int:shipid>/')
 @requires_roles("user")
 def single_order(shipid):
-    sql = 'SELECT Shipment.total AS shipmentTotal, P.sku, P.name, S.quantity, S.price * S.quantity AS total, User.name AS user ' \
+    sql = 'SELECT Shipment.total AS shipmentTotal, P.sku, P.name, S.quantity, S.price as price, S.price * S.quantity AS total, User.name AS user ' \
           'FROM User, Product AS P, ShippedProduct AS S, Shipment ' \
           'WHERE User.id = Shipment.userID AND Shipment.shipmentID = S.shipmentID AND P.sku = S.sku AND S.shipmentID = %s'
+
+    order_sql = "SELECT S.userID AS user_id, S.paymentMethodID, S.total AS order_total, SM.methodName AS shipping_name, SM.price AS shipment_price " \
+                "FROM Shipment S JOIN ShippingMethod SM ON S.shippingMethodID = SM.methodID " \
+                "WHERE shipmentID = %s"
+
     with get_db().cursor() as cursor:
-        cursor.execute(sql, [shipid])
+        cursor.execute(sql, shipid)
         data = cursor.fetchall()
-        print(str(data))
-        sum = data[0]["shipmentTotal"]
-        return render_template('single_order.html', data=data, sum=sum, id=shipid)
+        product_total = 0
+
+        for product in data:
+            product_total += product["quantity"] * product["price"]
+
+        cursor.execute(order_sql, shipid)
+        shipment = cursor.fetchone()
+
+        if not shipment:
+            flash("Not a valid shipment")
+            return abort(404)
+
+        if not is_user_admin() and not get_user_id() == shipment["user_id"]:
+            abort(403)
+
+        tax = int(round((product_total + shipment["shipment_price"]) * TAX_RATE))
+
+        return render_template('single_order.html', data=data, sum=product_total, id=shipid, shipment=shipment, tax=tax)
