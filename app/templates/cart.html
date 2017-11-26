@@ -8,10 +8,12 @@
             <td>{{ item.quantity }}</td>
             <td>{{ item.price }} caps</td>
             <td>{{ item.total }}</td>
+            <td><a href="{{ url_for('views.delete_from_cart', pid=item.sku) }}">X</a></td>
         </tr>
     {% endfor %}
     <tr>
         <td align="right" colspan = '5'>total: {{ subtotal }}</td>
+
     </tr>
 </table>
 {% endblock %}

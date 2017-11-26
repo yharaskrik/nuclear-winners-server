@@ -6,10 +6,12 @@ from . import get_db, app
 @app.route('/cart')
 def cart():
     if not session['logged_in']:
+        if 'cart' not in session:
+            session['cart'] = {}
+        # call method to display the cart, using the session cart data
         if not session['cart']:
-            return render_template('no_account.html')
+            return render_template('no_cart.html')
         else:
-            # call method to display the cart, using the session cart data
             ids = session['cart'].keys()
             sql = "SELECT sku, name, price FROM Product WHERE sku IN (%s)" % ','.join(["%s"] * len(ids))
             with get_db().cursor() as cursor:
@@ -20,9 +22,7 @@ def cart():
                     item['quantity'] = session['cart'][str(item['sku'])]
                     item['total'] = item['price'] * item['quantity']
                     subtotal += item['total']
-            return render_template('cart.html', cart=cart, subtotal=subtotal)
-
-
+        return render_template('cart.html', cart=cart, subtotal=subtotal)
     else:
         # call method to display the cart, using the database data
         with get_db().cursor() as cursor:
@@ -32,11 +32,14 @@ def cart():
                            'FROM ProductInCart AS PC, Product AS P WHERE '
                            'PC.sku = P.sku AND PC.cartID = %s', cart_id)
             cart = cursor.fetchall()
-            subtotal = 0
-            # add up the subtotal
-            for item in cart:
-                subtotal += item['total']
-            return render_template('cart.html', cart=cart, subtotal=subtotal)
+            if not cart:
+                return render_template('no_cart.html')
+            else:
+                subtotal = 0
+                # add up the subtotal
+                for item in cart:
+                    subtotal += item['total']
+                return render_template('cart.html', cart=cart, subtotal=subtotal)
 
 
 @app.route('/cart/add/<int:pid>/')
@@ -69,5 +72,20 @@ def add_to_cart(pid):
                 cursor.execute('UPDATE ProductInCart SET quantity = quantity + %s '
                                'WHERE cartID = (SELECT cartID FROM Cart WHERE userID = %s) AND sku = %s',
                                (quantity, session['user_id'], pid))
+            get_db().commit()
     flash('Added to cart')
+    return redirect(request.referrer)
+
+
+@app.route('/cart/delete/<int:pid>')
+def delete_from_cart(pid):
+    if not session['logged_in']:
+        session['cart'].pop(str(pid), None)
+    else:
+        with get_db().cursor() as cursor:
+            cursor.execute('DELETE FROM ProductInCart '
+                           'WHERE sku = %s AND cartID = (SELECT cartID FROM Cart WHERE userID = %s)',
+                           (pid, session['user_id']))
+            get_db().commit()
+    flash('Removed from cart')
     return redirect(request.referrer)
