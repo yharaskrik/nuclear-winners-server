@@ -1,100 +1,122 @@
 {% extends 'layout.html' %}
 {% block body %}
-    <form method="post" action="{{ url_for("place_order") }}">
-        <div>
-            <fieldset>
-                <legend>Cart</legend>
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th>Weight</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Total</th>
-                    </tr>
-                    {% for item in cart %}
-                        <tr>
-                            <td>{{ item.name }}</td>
-                            <td>{{ item.price }}</td>
-                            <td>{{ item.quantity }}</td>
-                            <td>{{ item.total }}</td>
-                        </tr>
-                    {% endfor %}
-                    <tr>
-                        <td>{{ total_weight }}</td>
-                        <td>Total: {{ total }}</td>
-                    </tr>
-                </table>
-                {% if not cart %}
-                    You have nothing in your cart
-                {% endif %}
-            </fieldset>
-        </div>
+    <div class="row">
+        <div class="col s10">
+            <form method="post" action="{{ url_for("place_order") }}">
+                <div class="card">
+                    <div>
+                        <fieldset>
+                            <legend>Cart</legend>
+                            <table class="highlight striped">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Weight</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                                {% for item in cart %}
+                                    <tr>
+                                        <td>{{ item.name }}</td>
+                                        <td>{{ item.price }}</td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>{{ item.total }}</td>
+                                    </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td>{{ total_weight }}</td>
+                                    <td>Total: {{ total }}</td>
+                                </tr>
+                            </table>
+                            {% if not cart %}
+                                You have nothing in your cart
+                            {% endif %}
+                        </fieldset>
+                    </div>
 
-        <div>
-            <fieldset>
-                <legend>Payment Method</legend>
-                {% for method in payment %}
-                    <tr>
-                        <td>
-                            <input type="radio" name="paymentMethod"
-                                   value="{{ method.methodID }}" {{ 'checked="checked"' if method.methodID|string == data.paymentMethod }}>{{ method.name }}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </fieldset>
-        </div>
+                    <div>
+                        <fieldset>
+                            <legend>Payment Method</legend>
+                            {% for method in payment %}
+                                <tr>
+                                    <td>
+                                        <input type="radio" name="paymentMethod"
+                                               value="{{ method.methodID }}" {{ 'checked="checked"' if method.methodID|string == data.paymentMethod }}>{{ method.name }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </fieldset>
+                    </div>
 
 
-        <div>
-            <fieldset>
-                <legend>Shipping Method</legend>
-                <table>
-                    <tr>
-                        <th>Method</th>
-                        <th>Price</th>
-                    </tr>
-                    {% for method in shipping %}
-                        <tr>
-                            <td>
-                                <input type="hidden" id="shippingPrice{{ method.methodID }}" value="{{ method.price }}">
-                                <input type="radio" name="shippingMethod" onclick="updateTotals()"
-                                       value="{{ method.methodID }}" {{ 'checked="checked"' if method.methodID|string == data.shippingMethod }} >{{ method.methodName }}
-                            </td>
-                            <td>{{ method.price if method.price > 0 else "Free!" }}</td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </fieldset>
-        </div>
+                    <div>
+                        <fieldset>
+                            <legend>Shipping Method</legend>
+                            <table>
 
-        <div>
-            <h2>Summary:</h2>
-            <table id="totals" style="border-collapse: collapse">
-                <tr>
-                    <th></th>
-                    <th align="right">caps</th>
-                </tr>
-                <tr>
-                    <td>Subtotal:</td>
-                    <td align="right">{{ total }}</td>
-                </tr>
-                <tr>
-                    <td>Shipping:</td>
-                    <td id="shippingTotal" align="right"></td>
-                </tr>
-                <tr style="border-top: 1px solid black">
-                    <td>Tax:</td>
-                    <td id="tax" align="right"></td>
-                </tr>
-                <tr style="border-top: 1px solid black">
-                    <td>Total:</td>
-                    <td id="total" align="right" style="font-weight: bold"></td>
-                </tr>
-            </table>
+                                {% for method in shipping %}
+                                    <tr>
+                                        {#                                    <p>#}
+                                        {#                                            <input type="hidden" id="shippingPrice{{ method.methodID }}"#}
+                                        {#                                                   value="{{ method.price }}">#}
+                                        {#                                            <input type="radio" name="shippingMethod" onclick="updateTotals()"#}
+                                        {#                                                   value="{{ method.methodID }}" {{ 'checked="checked"' if method.methodID|string == data.shippingMethod }} >{{ method.methodName }}#}
+                                        {##}
+                                        {#                                        {{ method.price if method.price > 0 else "Free!" }}#}
+                                        {#                                    </p>#}
+                                        <td>
+
+                                        </td>
+                                        <td>
+                                            <input class="with-gap" name="shippingMethod" type="radio"
+                                                   id="{{ method.methodID }}" value="{{ method.price }}" onclick="updateTotals(this)"/>
+                                            <label for="{{ method.methodID }}">{{ method.methodName }}</label>
+                                        </td>
+                                        <td>
+                                            {{ method.price if method.price > 0 else "Free!" }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+
+                        </fieldset>
+                    </div>
+
+                    <div>
+                        <h2>Summary:</h2>
+                        <table class="highlight striped" id="totals" style="border-collapse: collapse">
+                            <tr>
+                                <th></th>
+                                <th align="right">caps</th>
+                            </tr>
+                            <tr>
+                                <td>Subtotal:</td>
+                                <td align="right">{{ total }}</td>
+                            </tr>
+                            <tr>
+                                <td>Shipping:</td>
+                                <td id="shippingTotal" align="right"></td>
+                            </tr>
+                            <tr style="border-top: 1px solid black">
+                                <td>Tax:</td>
+                                <td id="tax" align="right"></td>
+                            </tr>
+                            <tr style="border-top: 1px solid black">
+                                <td>Total:</td>
+                                <td id="total" align="right" style="font-weight: bold"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="card-action">
+                        <input type="submit" value="Place Order">
+                    </div>
+                </div>
+            </form>
+
         </div>
-        <input type="submit" value="Place Order">
-    </form>
+    </div>
+    </div>
+    </div>
     <script>
         var tax = {{ tax }};
         var cartTotal = {{ total }}
@@ -102,8 +124,11 @@
                 var currentShipping = document.querySelector('input[name="shippingMethod"]:checked');
                 var shippingPrice = 0;
                 if (currentShipping) {
-                    var shippingId = currentShipping.value;
-                    shippingPrice = parseInt(document.getElementById("shippingPrice" + shippingId).value);
+                    var shippingId = currentShipping.id;
+                    console.log(shippingId);
+{#                    shippingPrice = parseInt(document.getElementById("shippingPrice" + shippingId).value);#}
+                    shippingPrice = parseInt(currentShipping.value);
+                    console.log(shippingPrice);
                 }
                 document.getElementById("shippingTotal").innerHTML = shippingPrice;
 
