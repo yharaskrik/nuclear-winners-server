@@ -1,4 +1,4 @@
-from flask import jsonify, render_template, session, request, redirect, flash
+from flask import render_template, session, request, redirect, flash
 
 from . import get_db, app
 
@@ -67,8 +67,8 @@ def add_to_cart(pid):
             # If they don't have the item in their cart, add it
             if not products_in_cart:
                 i = cursor.execute('INSERT INTO ProductInCart(cartID, sku, quantity) '
-                               'VALUES ((SELECT cartID FROM Cart WHERE userID = %s), %s, %s);',
-                               (session['user_id'], pid, quantity))
+                                   'VALUES ((SELECT cartID FROM Cart WHERE userID = %s), %s, %s);',
+                                   (session['user_id'], pid, quantity))
                 print(cursor._last_executed)
                 print("Rows updated: " + str(i))
             # If they do have the item in their cart, update the amount
@@ -81,7 +81,7 @@ def add_to_cart(pid):
     return redirect(request.referrer)
 
 
-@app.route('/cart/delete/<int:pid>')
+@app.route('/cart/delete/<int:pid>/')
 def delete_from_cart(pid):
     if not session['logged_in']:
         session['cart'].pop(str(pid), None)
@@ -93,3 +93,22 @@ def delete_from_cart(pid):
             get_db().commit()
     flash('Removed from cart')
     return redirect(request.referrer)
+
+
+@app.route('/cart/update/<int:pid>/')
+def update_cart(pid):
+    if 'quantity' not in request.args:
+        flash('Quantity not specified')
+        return redirect(request.referrer)
+
+    quantity = int(request.args['quantity'])
+    if not session['logged_in']:
+        session['cart'][str(pid)] = quantity
+    else:
+        with get_db().cursor() as cursor:
+            cursor.execute('UPDATE ProductInCart SET quantity = %s '
+                           'WHERE sku = %s AND cartID = (SELECT cartID FROM Cart WHERE userID = %s)',
+                           (quantity, pid, session['user_id']))
+            get_db().commit()
+            flash('Updated')
+            return redirect(request.referrer)
