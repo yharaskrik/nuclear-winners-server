@@ -7,22 +7,20 @@
 <body>
 <div class="page">
     <div class="header">
-        {% if not session.logged_in %}
-            <div style='float:right'>
+        <div style='float:right'>
+            <a href="{{ url_for('views.cart') }}">cart</a>
+            <form method="get" action="{{ url_for("view_products") }}">
+                <input type="text" placeholder="Search for products" name="search" value="{{ search }}">
+                <input type="submit" value="Search">
+            </form>
+            {% if not session.logged_in %}
                 <a href="{{ url_for('views.login') }}">log in</a>
-                <a href="{{ url_for('views.cart') }}">cart</a>
-            </div>
-        {% else %}
-            <div style='float:right'>
-                <form method="get" action="{{ url_for("view_products") }}">
-                    <input type="text" placeholder="Search for products" name="search" value="{{ search }}">
-                    <input type="submit" value="Search">
-                </form>
+            {% else %}
                 <a href="{{ url_for('views.view_account') }}">{{ session.user_name }}</a>
                 <a href="{{ url_for('views.logout') }}">log out</a>
 
-            </div>
-        {% endif %}
+                </div>
+            {% endif %}
     </div>
 
     <div class="content" style="clear: both">

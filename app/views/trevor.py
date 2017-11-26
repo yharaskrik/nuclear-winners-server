@@ -1,6 +1,5 @@
 # @app.route('/get/Product/<type:param>')
 # def name(param)
-from _sha256 import sha256
 
 from flask import request, render_template, session
 from werkzeug.security import generate_password_hash
@@ -34,6 +33,7 @@ def register_user():
                 cursor.execute(sql3, uid['id'])
             if not 'cart' in session:
                 cursor.execute('INSERT INTO Cart(userID) VALUES (%s)', cursor.lastrowid)
+            get_db().commit()
         return render_template('login.html')
         # return redirect(url_for('/login'))
     except Exception as e:

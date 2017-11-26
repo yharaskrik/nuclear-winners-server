@@ -1,0 +1,60 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <form>
+
+        <div>
+            <fieldset>
+                <legend>Cart</legend>
+                <table>
+                    {% for item in cart %}
+                        <tr>
+                            <td>item.name</td>
+                            <td>item.price</td>
+                            <td>item.quantity</td>
+                            <td>item.total</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+                {% if not cart %}
+                    You have nothing in your cart
+                {% endif %}
+            </fieldset>
+        </div>
+
+        <div>
+            <fieldset>
+                <legend>Payment Method</legend>
+                {% for method in payment %}
+                    <tr>
+                        <td>
+                            <input type="radio" name="payment"
+                                   value="{{ method.methodID }}">{{ method.name }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </fieldset>
+        </div>
+
+
+        <div>
+            <fieldset>
+                <legend>Shipping Method</legend>
+                <table>
+                    <tr>
+                        <th>Method</th>
+                        <th>Price</th>
+                    </tr>
+                    {% for method in shipping %}
+                        <tr>
+                            <td><input type="radio" name="shipping"
+                                       value="{{ method.methodID }}">{{ method.methodName }}
+                            </td>
+                            <td>{{ method.price if method.price > 0 else "Free!" }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </fieldset>
+        </div>
+        <input type="submit" value="Place Order">
+    </form>
+{% endblock %}
