@@ -1,19 +1,29 @@
 {% extends 'layout.html' %}
 {% block body %}
-    <form>
-
+    <form method="post" action="{{ url_for("place_order") }}">
         <div>
             <fieldset>
                 <legend>Cart</legend>
                 <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Weight</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
                     {% for item in cart %}
                         <tr>
-                            <td>item.name</td>
-                            <td>item.price</td>
-                            <td>item.quantity</td>
-                            <td>item.total</td>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.price }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.total }}</td>
                         </tr>
                     {% endfor %}
+                    <tr>
+                        <td>{{ total_weight }}</td>
+                        <td>Total: {{ total }}</td>
+                    </tr>
                 </table>
                 {% if not cart %}
                     You have nothing in your cart
@@ -27,8 +37,8 @@
                 {% for method in payment %}
                     <tr>
                         <td>
-                            <input type="radio" name="payment"
-                                   value="{{ method.methodID }}">{{ method.name }}
+                            <input type="radio" name="paymentMethod"
+                                   value="{{ method.methodID }}" {{ 'checked="checked"' if method.methodID|string == data.paymentMethod }}>{{ method.name }}
                         </td>
                     </tr>
                 {% endfor %}
@@ -46,8 +56,10 @@
                     </tr>
                     {% for method in shipping %}
                         <tr>
-                            <td><input type="radio" name="shipping"
-                                       value="{{ method.methodID }}">{{ method.methodName }}
+                            <td>
+                                <input type="hidden" id="shippingPrice{{ method.methodID }}" value="{{ method.price }}">
+                                <input type="radio" name="shippingMethod" onclick="updateTotals()"
+                                       value="{{ method.methodID }}" {{ 'checked="checked"' if method.methodID|string == data.shippingMethod }} >{{ method.methodName }}
                             </td>
                             <td>{{ method.price if method.price > 0 else "Free!" }}</td>
                         </tr>
@@ -55,6 +67,50 @@
                 </table>
             </fieldset>
         </div>
+
+        <div>
+            <h2>Summary:</h2>
+            <table id="totals" style="border-collapse: collapse">
+                <tr>
+                    <th></th>
+                    <th align="right">caps</th>
+                </tr>
+                <tr>
+                    <td>Subtotal:</td>
+                    <td align="right">{{ total }}</td>
+                </tr>
+                <tr>
+                    <td>Shipping:</td>
+                    <td id="shippingTotal" align="right"></td>
+                </tr>
+                <tr style="border-top: 1px solid black">
+                    <td>Tax:</td>
+                    <td id="tax" align="right"></td>
+                </tr>
+                <tr style="border-top: 1px solid black">
+                    <td>Total:</td>
+                    <td id="total" align="right" style="font-weight: bold"></td>
+                </tr>
+            </table>
+        </div>
         <input type="submit" value="Place Order">
     </form>
+    <script>
+        var tax = {{ tax }};
+        var cartTotal = {{ total }}
+            function updateTotals() {
+                var currentShipping = document.querySelector('input[name="shippingMethod"]:checked');
+                var shippingPrice = 0;
+                if (currentShipping) {
+                    var shippingId = currentShipping.value;
+                    shippingPrice = parseInt(document.getElementById("shippingPrice" + shippingId).value);
+                }
+                document.getElementById("shippingTotal").innerHTML = shippingPrice;
+
+                var taxprice = Math.round((cartTotal + shippingPrice) * tax);
+                document.getElementById("tax").innerHTML = taxprice;
+                document.getElementById("total").innerHTML = (cartTotal + shippingPrice + taxprice);
+            };
+        updateTotals();
+    </script>
 {% endblock %}

@@ -1,20 +1,24 @@
 {% extends "layout.html" %}
 {% block body %}
-<p>Shipment ID: {{ id }}   User: {{ data['user'] }}   Total Value: {{ sum }}</p>
+    <p>Shipment ID: {{ id }} {% if session["user_admin"] %} {{ data['user'] }} {% endif %} Total Value: {{ sum }}</p>
     <table border="1">
         <tr>
-            <th>Product ID</th>
+            {% if session["user_admin"] %}
+                <th>Product ID</th>
+            {% endif %}
             <th>Product Name</th>
             <th>Quantity</th>
             <th>Total</th>
         </tr>
-    {%  for order in data %}
-        <tr>
-            <td>{{ order['sku'] }}</td>
-            <td>{{ order['name'] }}</td>
-            <td>{{ order['quantity'] }}</td>
-            <td>{{ order['total'] }}</td>
-        </tr>
-    {% endfor %}
+        {% for order in data %}
+            <tr>
+                {% if session["user_admin"] %}
+                    <td>{{ order['sku'] }}</td>
+                {% endif %}
+                <td>{{ order['name'] }}</td>
+                <td>{{ order['quantity'] }}</td>
+                <td>{{ order['total'] }}</td>
+            </tr>
+        {% endfor %}
     </table>
 {% endblock %}

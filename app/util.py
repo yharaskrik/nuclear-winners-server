@@ -11,7 +11,7 @@ def is_logged_in():
     return 'logged_in' in session and session["logged_in"]
 
 
-def get_logged_in_user_id():
+def get_user_id():
     """Returns the current user's id from the session or null if the user is not logged in"""
     if is_logged_in():
         return session["user_id"]

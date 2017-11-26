@@ -79,18 +79,3 @@ def list_reports():
                 finishedtotal += order['total']
         return render_template('list_reports.html', data=shipments, data2=finishedshipments, totalsum=total,
                                totalorders=orders, finishedsum=finishedtotal, finishedorders=finishedorders)
-
-
-@app.route('/admin/reports/order/<int:shipid>')
-@requires_roles("admin")
-def single_order(shipid):
-    sql = 'SELECT P.sku, P.name, S.quantity, SUM(P.price * S.quantity) AS total, User.name AS user ' \
-          'FROM User, Product AS P, ShippedProduct AS S, Shipment ' \
-          'WHERE User.id = Shipment.userID AND Shipment.shipmentID = S.shipmentID AND P.sku = S.sku AND S.shipmentID = %s'
-    with get_db().cursor() as cursor:
-        cursor.execute(sql, [shipid])
-        data = cursor.fetchall()
-        sum = 0
-        for product in data:
-            sum += product['total']
-        return render_template('single_order.html', data=data, sum=sum, id=shipid)
