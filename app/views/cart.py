@@ -59,14 +59,18 @@ def add_to_cart(pid):
     else:
         # Check if they already have the item in their cart
         with get_db().cursor() as cursor:
+            print(session['user_id'])
             cursor.execute('SELECT sku FROM ProductInCart AS PC, Cart AS C '
                            'WHERE C.cartID = PC.cartID AND C.userID = %s AND sku = %s', (session['user_id'], pid))
             products_in_cart = cursor.fetchall()
+            print(str(products_in_cart))
             # If they don't have the item in their cart, add it
             if not products_in_cart:
-                cursor.execute('INSERT INTO ProductInCart(cartID, sku, quantity) '
-                               'VALUES ((SELECT cartID FROM Cart WHERE userID = %s), %s, %s)',
+                i = cursor.execute('INSERT INTO ProductInCart(cartID, sku, quantity) '
+                               'VALUES ((SELECT cartID FROM Cart WHERE userID = %s), %s, %s);',
                                (session['user_id'], pid, quantity))
+                print(cursor._last_executed)
+                print("Rows updated: " + str(i))
             # If they do have the item in their cart, update the amount
             else:
                 cursor.execute('UPDATE ProductInCart SET quantity = quantity + %s '

@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+{% block body %}
+<p>
+{%  for cat in categories %}
+    <a href="{{ url_for('view_products',cid=cat['id']) }}">{{ cat['name'] }}</a>
+    <br>
+{% endfor %}
+</p>
+{% endblock %}

@@ -19,7 +19,7 @@ filter_prod_sql = "SELECT * FROM Product WHERE name LIKE %s"
 
 
 @app.route("/products/", methods=['GET'])
-@app.route("/products/<int:cid>/", methods=['GET'])
+@app.route("/products/category/<int:cid>", methods=['GET'])
 def view_products(cid=None):
     sql = list_prod_sql
 
@@ -91,6 +91,7 @@ def edit_product(sku):
     try:
         with get_db().cursor() as cursor:
             cursor.execute(sql, args)
+            get_db().commit()
             flash("Updated product")
             return redirect(url_for("view_product", sku=sku))
     except Exception as e:
@@ -121,6 +122,7 @@ def add_product():
     try:
         with get_db().cursor() as cursor:
             rows = cursor.execute(sql, args)
+            get_db().commit()
             if rows == 1:
                 return redirect(url_for("view_product", sku=cursor.lastrowid))
     except Exception as e:
