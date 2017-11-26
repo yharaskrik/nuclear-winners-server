@@ -14,7 +14,6 @@ app = Flask(__name__)
 app.config.from_object(config)
 
 
-
 def connect_db():
     """Connects to the applicaiton database"""
     connection = pymysql.connect(host=dbconfig.db_host,
@@ -23,6 +22,7 @@ def connect_db():
                                  db=dbconfig.db,
                                  charset='utf8mb4',
                                  cursorclass=pymysql.cursors.DictCursor)
+    connection.autocommit(True)
     return connection
 
 
@@ -74,3 +74,4 @@ def not_authorized(e):
 from .product import *
 from .admin import *
 from .categories import *
+from .order import *
