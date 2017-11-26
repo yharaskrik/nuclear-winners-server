@@ -1,8 +1,7 @@
-import flask
-
-from .views.user_login import requires_roles
-from . import app, get_db
 from flask import render_template, request, redirect, flash, url_for
+
+from . import app, get_db
+from .views.user_login import requires_roles
 
 
 @app.route("/admin/categories")
@@ -57,6 +56,12 @@ def edit_category(catID):
     return render_template("add_edit_category.html", data=request.form)
 
 
+@app.route("/browse/")
+def view_categories():
+    cat = fetch_categories()
+    return render_template('list_categories.html', categories=cat)
+
+
 def fetch_categories():
     """Fetched and returns all the categories from the database
 
@@ -78,6 +83,7 @@ def insert_category(name):
     try:
         with get_db().cursor() as cursor:
             rows = cursor.execute(sql, name)
+            get_db().commit()
             # Check if a row was created.
             return rows == 1
     except Exception as e:
@@ -93,6 +99,7 @@ def update_category(cat_id, name):
     try:
         with get_db().cursor() as cursor:
             rows = cursor.execute(sql, (name, cat_id))
+            get_db().commit()
             # Check if a row was affected.
             return rows == 1
     except Exception as e:

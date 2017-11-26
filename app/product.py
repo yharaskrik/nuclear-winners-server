@@ -6,7 +6,8 @@ from app import app, get_db
 from .categories import fetch_categories
 from .views.user_login import requires_roles
 
-create_prod_sql_with_image = "INSERT INTO Product (name, description , price, weight, inventory, visible, category, image) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+create_prod_sql_with_image = "INSERT INTO Product (name, description , price, weight, inventory, visible, category, image) " \
+                             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
 create_prod_sql_no_image = "INSERT INTO Product (name, description , price, weight, inventory, visible, category) VALUES (%s, %s, %s, %s, %s, %s, %s)"
 update_prod_sql_no_image = "UPDATE Product SET name = %s, description=%s, price=%s, weight = %s, inventory = %s, visible = %s, category = %s WHERE sku = %s"
 update_prod_sql_with_image = "UPDATE Product SET name = %s, description=%s, price=%s, weight = %s, inventory = %s, visible = %s, category = %s, image=%s WHERE sku = %s"
@@ -18,8 +19,10 @@ filter_prod_sql = "SELECT * FROM Product WHERE name LIKE %s"
 
 
 @app.route("/products/", methods=['GET'])
-def view_products():
+@app.route("/products/category/<int:cid>", methods=['GET'])
+def view_products(cid=None):
     sql = list_prod_sql
+
     args = []
     search = ""
     if 'search' in request.args:
@@ -27,10 +30,17 @@ def view_products():
         search = request.args["search"]
         args.append("%" + request.args["search"] + "%")
 
+    if cid:
+        if search:
+            sql += " and category = %s"
+        else:
+            sql += " WHERE category = %s"
+        args.append(cid)
+
     with get_db().cursor() as cursor:
         cursor.execute(sql, args)
         result = cursor.fetchall()
-        return render_template("product_list.html", products=result, search=search)
+        return render_template("product_list.html", products=result, search=search, cid=cid)
 
 
 @app.route("/product/<sku>")
@@ -81,6 +91,7 @@ def edit_product(sku):
     try:
         with get_db().cursor() as cursor:
             cursor.execute(sql, args)
+            get_db().commit()
             flash("Updated product")
             return redirect(url_for("view_product", sku=sku))
     except Exception as e:
@@ -111,6 +122,7 @@ def add_product():
     try:
         with get_db().cursor() as cursor:
             rows = cursor.execute(sql, args)
+            get_db().commit()
             if rows == 1:
                 return redirect(url_for("view_product", sku=cursor.lastrowid))
     except Exception as e:

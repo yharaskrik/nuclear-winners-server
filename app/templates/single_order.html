@@ -1,20 +1,53 @@
 {% extends "layout.html" %}
 {% block body %}
-<p>Shipment ID: {{ id }}   User: {{ data['user'] }}   Total Value: {{ sum }}</p>
+    <p>Shipment ID: {{ id }} {% if session["user_admin"] %} {{ data['user'] }} {% endif %} Total Value: {{ sum }}</p>
     <table border="1">
         <tr>
-            <th>Product ID</th>
             <th>Product Name</th>
             <th>Quantity</th>
+            <th>Price</th>
             <th>Total</th>
         </tr>
-    {%  for order in data %}
+        {% for product in data %}
+            <tr>
+                <td><a href="{{ url_for("view_product", sku=product.sku) }}">{{ product['name'] }}</a></td>
+                <td>{{ product['quantity'] }}</td>
+                <td>{{ product['price'] }}</td>
+                <td align="right">{{ product['total'] }}</td>
+            </tr>
+        {% endfor %}
         <tr>
-            <td>{{ order['sku'] }}</td>
-            <td>{{ order['name'] }}</td>
-            <td>{{ order['quantity'] }}</td>
-            <td>{{ order['total'] }}</td>
+            <td colspan="3" align="right">
+                Subtotal
+            </td>
+            <td align="right">
+                {{ sum }}
+            </td>
         </tr>
-    {% endfor %}
+        <tr>
+            <td colspan="3" align="right">
+                {{ shipping_name }}Shipping:
+            </td>
+            <td align="right">
+                {{ shipment.shipment_price }}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" align="right">
+                Tax:
+            </td>
+            <td align="right">
+                {{ tax }}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" align="right">
+                Order Total:
+            </td>
+            <td align="right">
+                {{ shipment.order_total }}
+            </td>
+            <td>caps</td>
+        </tr>
     </table>
 {% endblock %}
