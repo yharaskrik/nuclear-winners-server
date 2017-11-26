@@ -41,10 +41,3 @@ def order_history():
                 for product in order['products']:
                     order['subtotal'] += product['total']
             return render_template('order_history.html', orders=orders)
-
-@app.route('/cart')
-def cart():
-    if not session['logged_in']:
-        return render_template('no_account.html')
-    else:
-        return render_template('cart.html')
