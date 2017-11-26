@@ -58,7 +58,8 @@ def edit_category(catID):
 
 @app.route("/browse/")
 def view_categories():
-    pass
+    cat = fetch_categories()
+    return render_template('list_categories.html',categories=cat)
 
 def fetch_categories():
     """Fetched and returns all the categories from the database

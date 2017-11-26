@@ -1,7 +1,11 @@
 # @app.route('/get/Product/<type:param>')
 # def name(param)
+from _sha256 import sha256
+
 from flask import jsonify, request, render_template, session
-from . import get_db, app
+from werkzeug.security import generate_password_hash
+
+from . import get_db, app, requires_roles
 
 
 #allows users to create an account
@@ -10,6 +14,7 @@ def register_user():
     if request.method == 'GET':
         return render_template("register_user.html",data={})
     data = request.form
+    username = data['username']
     #validates entered information
     if  data['password'] != data['confirmpassword']:
         return render_template('register_user.html',data=data,errormsg='Password does not match.')
@@ -18,7 +23,13 @@ def register_user():
     sql = 'INSERT INTO User(name,pass,address,accountType,username) VALUES(%s,%s,%s,0,%s)'
     try:
         with get_db().cursor() as cursor:
-            cursor.execute(sql,[data['name'],data['password'],data['address'],data['username']])
+            cursor.execute(sql,[data['name'],generate_password_hash(data['password'],method='pbkdf2:sha256', salt_length=8),data['address'],data['username']])
+            if 'robot' in data and data['robot'] == 'robot':
+                sql2 = 'SELECT * FROM User WHERE username = %s'
+                cursor.execute(sql2,username)
+                uid = cursor.fetchone()
+                sql3 = 'INSERT INTO UserMutation(userID, mutationID) VALUES(%s,1)'
+                cursor.execute(sql3,uid['id'])
             if not 'cart' in session:
                 cursor.execute('INSERT INTO Cart(userID) VALUES (%s)', cursor.lastrowid)
         return render_template('login.html')
@@ -30,6 +41,7 @@ def register_user():
 
 #allows admins to see a list of all customers
 @app.route('/admin/customers')
+@requires_roles("admin")
 def list_customers():
     sql = 'SELECT * FROM User WHERE accountType = 0'
     with get_db().cursor() as cursor:
@@ -39,6 +51,7 @@ def list_customers():
     return 'picnic'
 
 @app.route('/admin/reports')
+@requires_roles("admin")
 def list_reports():
     sql = 'SELECT U.id, U.name, U.address, S.shipmentID, methodName, PaymentMethod.name AS payment, S.total '\
     'FROM User AS U, Shipment AS S, ShippingMethod, PaymentMethod '\
@@ -65,6 +78,7 @@ def list_reports():
         return render_template('list_reports.html', data=shipments,data2=finishedshipments,totalsum=total,totalorders=orders,finishedsum=finishedtotal,finishedorders=finishedorders)
 
 @app.route('/admin/reports/order/<int:shipid>')
+@requires_roles("admin")
 def single_order(shipid):
     sql = 'SELECT P.sku, P.name, S.quantity, SUM(P.price * S.quantity) AS total, User.name AS user '\
     'FROM User, Product AS P, ShippedProduct AS S, Shipment '\
@@ -76,6 +90,3 @@ def single_order(shipid):
         for product in data:
             sum += product['total']
         return render_template('single_order.html', data=data,sum=sum,id=shipid)
-
-
-
