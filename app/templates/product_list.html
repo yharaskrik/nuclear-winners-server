@@ -11,7 +11,7 @@
             <td><a href="{{ url_for('view_product', sku=item.sku) }}">{{ item.name }}</a></td>
             <td>{{ item.description }}</td>
             <td>{{ item.price }} caps</td>
-            <td>Add to cart</td>
+            <td><a href = "{{ url_for('views.add_to_cart', pid = item.sku) }}">add</a> </td>
         </tr>
     {% endfor %}
 </table>
