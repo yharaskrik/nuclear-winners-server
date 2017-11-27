@@ -9,9 +9,9 @@ from .util import get_user_id, is_user_admin
 from .views.user_login import requires_roles
 
 
-@app.route("/order/", methods=['GET'])
+@app.route("/checkout/", methods=['GET'])
 @requires_roles("user")
-def order_options(data=None):
+def checkout(data=None):
     if data is None:
         data = {"shippingMethod": "1"}
     shipping = get_shipping_methods()
@@ -64,7 +64,7 @@ def place_order():
 
     if not valid:
         # Return the form with entered values
-        return order_options(data)
+        return checkout(data)
 
     cart_id = cart[0]["cartID"]
 
@@ -98,7 +98,7 @@ def place_order():
     except Exception as e:
         app.logger.error(e)
         flash("Unable to place order. Please try again")
-        return order_options(data)
+        return checkout(data)
     return redirect(url_for("single_order", shipid=order_id))
 
 

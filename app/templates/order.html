@@ -1,128 +1,170 @@
 {% extends 'layout.html' %}
 {% block body %}
     <div class="row">
-        <div class="col s10">
+        <div class="col s9" id="order-content">
             <form id="my_form" method="post" action="{{ url_for("place_order") }}">
                 <div class="card">
-                    <div>
-                        <fieldset>
-                            <legend>Cart</legend>
-                            <table class="highlight striped">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Weight</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th>Total</th>
-                                </tr>
-                                {% for item in cart %}
-                                    <tr>
-                                        <td>{{ item.name }}</td>
-                                        <td>{{ item.price }}</td>
-                                        <td>{{ item.quantity }}</td>
-                                        <td>{{ item.total }}</td>
-                                    </tr>
-                                {% endfor %}
-                                <tr>
-                                    <td>{{ total_weight }}</td>
-                                    <td>Total: {{ total }}</td>
-                                </tr>
-                            </table>
-                            {% if not cart %}
-                                You have nothing in your cart
-                            {% endif %}
-                        </fieldset>
-                    </div>
-
-                    <div>
-                        <fieldset>
-                            <legend>Payment Method</legend>
-                            <table>
-                                {% for method in payment %}
-                                    <tr>
-                                        <td>
-                                            <input class="with-gap" type="radio" name="paymentMethod"
-                                                   value="{{ method.methodID }}" id="{{ method.methodID }}p">
-                                            <label for="{{ method.methodID }}p">{{ method.name }}</label>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                        </fieldset>
-                    </div>
-
-
-                    <div>
-                        <fieldset>
-                            <legend>Shipping Method</legend>
-                            <table>
-
-                                {% for method in shipping %}
-                                    <tr>
-                                        <td>
-                                            <input class="with-gap" name="shippingMethod" type="radio"
-                                                   id="{{ method.methodID }}s" value="{{ method.methodID }}"
-                                                   onclick="updateTotals()"/>
-                                            <label for="{{ method.methodID }}s">{{ method.methodName }}</label>
-                                        </td>
-                                        <td>
-                                            {{ method.price if method.price > 0 else "Free!" }}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                        </fieldset>
-                    </div>
-
-                    <div>
-                        <h2>Summary:</h2>
-                        <table class="highlight striped" id="totals" style="border-collapse: collapse">
+                    <div class="card-content">
+                        <span class="card-title">Cart</span>
+                        <table class="highlight striped">
                             <tr>
-                                <th></th>
-                                <th align="right">caps</th>
+                                <th>Name</th>
+                                <th>Weight (kg)</th>
+                                <th>Price (caps)</th>
+                                <th>Quantity</th>
+                                <th>Total (caps)</th>
                             </tr>
+                            {% for item in cart %}
+                                <tr>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.weight }}</td>
+                                    <td>{{ item.price }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.subtotal }}</td>
+                                </tr>
+                            {% endfor %}
                             <tr>
-                                <td>Subtotal:</td>
-                                <td align="right">{{ total }}</td>
+                                <td></td>
+                                <td></td>
+                                <td>{{ total_weight }}</td>
+                                <td class="right-align">Total:</td>
+                                <td> {{ total }}</td>
+                            </tr>
+                        </table>
+                        {% if not cart %}
+                            You have nothing in your cart
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Payment Method</span>
+                        <table>
+                            {% for method in payment %}
+                                <tr>
+                                    <td>
+                                        <input class="with-gap" type="radio" name="paymentMethod"
+                                               value="{{ method.methodID }}" id="{{ method.methodID }}p">
+                                        <label for="{{ method.methodID }}p">{{ method.name }}</label>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Shipping Method</span>
+                        <table>
+
+                            {% for method in shipping %}
+                                <tr>
+                                    <td>
+                                        <input class="with-gap" name="shippingMethod" type="radio"
+                                               id="{{ method.methodID }}s" value="{{ method.methodID }}"
+                                               onclick="updateTotals()"/>
+                                        <label for="{{ method.methodID }}s">{{ method.methodName }}</label>
+                                    </td>
+                                    <td>
+                                        {{ method.price if method.price > 0 else "Free!" }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col s3" id="sidebar">
+            <div id="order-summary">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Order Summary</span>
+                        <table class="highlight" id="totals">
+                            <tr>
+                                <td>Cart Subtotal:</td>
+                                <td class="right-align">{{ total }}</td>
+                                <td>caps</td>
                             </tr>
                             <tr>
                                 <td>Shipping:</td>
-                                <td id="shippingTotal" align="right"></td>
+                                <td id="shippingTotal" class="right-align"></td>
+                                <td>caps</td>
                             </tr>
                             <tr style="border-top: 1px solid black">
                                 <td>Tax:</td>
-                                <td id="tax" align="right"></td>
+                                <td id="tax" class="right-align"></td>
+                                <td>caps</td>
                             </tr>
                             <tr style="border-top: 1px solid black">
                                 <td>Total:</td>
-                                <td id="total" align="right" style="font-weight: bold"></td>
+                                <td id="total" class="right-align" style="font-weight: bold"></td>
+                                <td>caps</td>
                             </tr>
                         </table>
                     </div>
                     <div class="card-action">
-                        <a href="javascript:{}" onclick="document.getElementById('my_form').submit();">Place Order</a>
+                        <a class="waves-effect waves-light btn" href="javascript:{}"
+                           onclick="document.getElementById('my_form').submit();" style="display: block;">Place
+                            Order</a>
                     </div>
                 </div>
-            </form>
-
+            </div>
         </div>
+
     </div>
     <script>
         var tax = {{ tax }};
-        var cartTotal = {{ total }}
-            function updateTotals() {
-                var currentShipping = document.querySelector('input[name="shippingMethod"]:checked');
-                var shippingPrice = 0;
-                if (currentShipping) {
-                    var shippingId = currentShipping.id;
-                    shippingPrice = parseInt(currentShipping.value);
-                }
-                document.getElementById("shippingTotal").innerHTML = shippingPrice;
+        var cartTotal = {{ total }};
 
-                var taxprice = Math.round((cartTotal + shippingPrice) * tax);
-                document.getElementById("tax").innerHTML = taxprice;
-                document.getElementById("total").innerHTML = (cartTotal + shippingPrice + taxprice);
+        var shippingMethods =
+            {
+                {% for method in shipping %}
+                    "{{ method.methodID }}": {{ method.price }},
+                {% endfor %}
             };
-        updateTotals();
+
+
+        function updateTotals() {
+            var shippingId = $("input[name='shippingMethod']:checked").val();
+            if (shippingId) {
+                shippingPrice = shippingMethods[shippingId];
+            }
+            document.getElementById("shippingTotal").innerHTML = shippingPrice;
+            var taxprice = Math.round((cartTotal + shippingPrice) * tax);
+            document.getElementById("tax").innerHTML = taxprice;
+            document.getElementById("total").innerHTML = (cartTotal + shippingPrice + taxprice);
+        }
+
+        function updateSidbarSize() {
+            var new_width = $('#sidebar').width();
+            $('#order-summary').width(new_width);
+
+        }
+
+        $(document).ready(function () {
+            $('input[type=radio][name=shippingMethod]').change(function () {
+                updateTotals();
+            });
+
+            // Setup pushpin sidebar
+            var $this = $(this);
+            var $target = $('#order-summary');
+            $target.pushpin({
+                top: $target.offset().top,
+                bottom: $("#order-content").offset().bottom
+            });
+
+            $(window).resize(function () {
+                updateSidbarSize();
+            });
+
+            updateSidbarSize()
+            updateTotals();
+
+        });
+
     </script>
 {% endblock %}
