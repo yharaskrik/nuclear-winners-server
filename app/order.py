@@ -6,6 +6,7 @@ from . import get_db
 from .payment_methods import get_payment_methods
 from .shipping import get_shipping_methods, get_shipping_method_price
 from .util import get_user_id, is_user_admin
+from .views.cart import validate_inventory
 from .views.user_login import requires_roles
 
 
@@ -69,7 +70,9 @@ def place_order():
     cart_id = cart[0]["cartID"]
 
     # Validate Product supply
-    # TODO Add trevors validate inventory
+    if not validate_inventory(cart_id):
+        flash("One of your products has more items then there is in stock")
+        return checkout(data)
 
     order_id = 0
     try:
@@ -130,7 +133,7 @@ def get_cart():
 @app.route('/order/details/<int:shipid>/')
 @requires_roles("user")
 def single_order(shipid):
-    sql = 'SELECT Shipment.total AS shipmentTotal, P.sku, P.name, S.quantity, S.price as price, S.price * S.quantity AS total, User.name AS user ' \
+    sql = 'SELECT Shipment.total AS shipmentTotal, P.sku, P.name, S.quantity, S.price AS price, S.price * S.quantity AS total, User.name AS user ' \
           'FROM User, Product AS P, ShippedProduct AS S, Shipment ' \
           'WHERE User.id = Shipment.userID AND Shipment.shipmentID = S.shipmentID AND P.sku = S.sku AND S.shipmentID = %s'
 

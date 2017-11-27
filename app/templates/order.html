@@ -106,7 +106,7 @@
                         </table>
                     </div>
                     <div class="card-action">
-                        <a class="waves-effect waves-light btn" href="javascript:{}"
+                        <a id="checkout-button" class="waves-effect waves-light btn" href="javascript:{}"
                            onclick="document.getElementById('my_form').submit();" style="display: block;">Place
                             Order</a>
                     </div>
@@ -128,14 +128,23 @@
 
 
         function updateTotals() {
-            var shippingId = $("input[name='shippingMethod']:checked").val();
-            if (shippingId) {
-                shippingPrice = shippingMethods[shippingId];
+            var shippingPrice = 0;
+            var hasShippingSelected = $("input[name='shippingMethod']:checked").length > 0;
+            var hasPaymentSelected = $("input[name='paymentMethod']:checked").length > 0;
+            if (hasShippingSelected) {
+                shippingPrice = shippingMethods[$("input[name='shippingMethod']:checked").val()];
             }
             document.getElementById("shippingTotal").innerHTML = shippingPrice;
             var taxprice = Math.round((cartTotal + shippingPrice) * tax);
             document.getElementById("tax").innerHTML = taxprice;
             document.getElementById("total").innerHTML = (cartTotal + shippingPrice + taxprice);
+
+            if (hasPaymentSelected && hasShippingSelected) {
+                $('#checkout-button').removeClass("disabled")
+            } else {
+                $('#checkout-button').addClass("disabled")
+            }
+
         }
 
         function updateSidbarSize() {
