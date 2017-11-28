@@ -33,17 +33,15 @@ def order_history():
     else:
         #get information on the orderids related to the user
         with get_db().cursor() as cursor:
-            cursor.execute('SELECT S.shipmentID, S.status, S.shippingMethodID, S.paymentMethodID '
+            cursor.execute('SELECT S.shipmentID, S.status, S.shippingMethodID, S.paymentMethodID, S.total '
                        'FROM Shipment AS S WHERE S.userID = %s', session['user_id'])
             orders = cursor.fetchall()
             #loop through, getting all the products in each of the orders
             for order in orders:
-                order['subtotal'] = 0
                 cursor.execute('SELECT P.name, SP.quantity, (P.price*SP.quantity) AS total '
                            'FROM Product AS P, ShippedProduct AS SP '
                            'WHERE SP.sku = P.sku AND SP.shipmentID = %s', order['shipmentID'])
                 order['products'] = cursor.fetchall()
                 #add the total prices together to make a subtotal
-                for product in order['products']:
-                    order['subtotal'] += product['total']
+
             return render_template('order_history.html', orders=orders)

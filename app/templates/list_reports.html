@@ -10,6 +10,7 @@
             <th>Shipping Method</th>
             <th>Payment Method</th>
             <th>Total</th>
+            <th>Send Order</th>
         </tr>
     {%  for order in data %}
         <tr>
@@ -20,11 +21,12 @@
             <td>{{ order['methodName'] }}</td>
             <td>{{ order['payment'] }}</td>
             <td>{{ order['total'] }}</td>
+            <td><a href="{{ url_for('send_order',shipid=order['shipmentID']) }}" class="waves-effect waves-light btn">Send Order</a></td>
         </tr>
     {% endfor %}
     </table>
 
-    <p>Finished Orders: {{ finishedorders }}   Total Value: {{ finishedtotal }}</p>
+    <p>Finished Orders: {{ finishedorders }}   Total Value: {{ finishedsum }}</p>
     <table border="1">
         <tr>
             <th>Shipment ID</th>
@@ -37,7 +39,7 @@
         </tr>
     {%  for order in data2 %}
         <tr>
-            <td><a href="{{ url_for('single_order',shipid=order['shipmentID']) }}">{{ order['shipmentID'] }}</a>></td>
+            <td><a href="{{ url_for('single_order',shipid=order['shipmentID']) }}">{{ order['shipmentID'] }}</a></td>
             <td>{{ order['id'] }}</td>
             <td>{{ order['name'] }}</td>
             <td>{{ order['address'] }}</td>

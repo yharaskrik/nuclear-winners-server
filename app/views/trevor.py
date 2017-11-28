@@ -4,7 +4,7 @@
 from flask import request, render_template, session
 from werkzeug.security import generate_password_hash
 
-from . import get_db, app, requires_roles
+from . import get_db, app, requires_roles, redirect
 
 
 # allows users to create an account
@@ -20,6 +20,7 @@ def register_user():
     if not data['name'] or not data['username'] or not data['password'] or not data['address']:
         return render_template('register_user.html', data=data, errormsg='All fields are required.')
     sql = 'INSERT INTO User(name,pass,address,accountType,username) VALUES(%s,%s,%s,0,%s)'
+    get_db().commit()
     try:
         with get_db().cursor() as cursor:
             cursor.execute(sql, [data['name'],
@@ -31,8 +32,7 @@ def register_user():
                 uid = cursor.fetchone()
                 sql3 = 'INSERT INTO UserMutation(userID, mutationID) VALUES(%s,1)'
                 cursor.execute(sql3, uid['id'])
-            if not 'cart' in session:
-                cursor.execute('INSERT INTO Cart(userID) VALUES (%s)', cursor.lastrowid)
+            cursor.execute('INSERT INTO Cart(userID) VALUES (%s)', cursor.lastrowid)
             get_db().commit()
         return render_template('login.html')
         # return redirect(url_for('/login'))
@@ -58,12 +58,12 @@ def list_customers():
 def list_reports():
     sql = 'SELECT U.id, U.name, U.address, S.shipmentID, methodName, PaymentMethod.name AS payment, S.total ' \
           'FROM User AS U, Shipment AS S, ShippingMethod, PaymentMethod ' \
-          'WHERE U.id = S.userID AND S.shippingMethodID = ShippingMethod.methodID AND S.paymentMethodID = PaymentMethod.methodID AND S.status = %s'
+          'WHERE U.id = S.userID AND S.shippingMethodID = ShippingMethod.methodID AND S.paymentMethodID = PaymentMethod.methodID AND S.status = %s ORDER BY S.shipmentID'
 
     with get_db().cursor() as cursor:
-        cursor.execute(sql, [1])
+        cursor.execute(sql, [0])
         shipments = cursor.fetchall()
-        cursor.execute(sql, [2])
+        cursor.execute(sql, [1])
         finishedshipments = cursor.fetchall()
         total = 0
         orders = 0
@@ -79,3 +79,13 @@ def list_reports():
                 finishedtotal += order['total']
         return render_template('list_reports.html', data=shipments, data2=finishedshipments, totalsum=total,
                                totalorders=orders, finishedsum=finishedtotal, finishedorders=finishedorders)
+
+
+@app.route('/admin/send/<int:shipid>/')
+@requires_roles('admin')
+def send_order(shipid):
+    sql = 'UPDATE Shipment SET status = 1 WHERE shipmentID = %s'
+    with get_db().cursor() as cursor:
+        cursor.execute(sql, shipid)
+        get_db().commit()
+    return redirect(request.referrer)
