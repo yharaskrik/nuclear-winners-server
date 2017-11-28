@@ -1,7 +1,7 @@
 from . import get_db
 
-get_shipping_sql = "SELECT * FROM ShippingMethod"
-get_shipping_sql_weight = "SELECT * FROM ShippingMethod WHERE maxWeight > %s"
+get_shipping_sql = "SELECT * FROM ShippingMethod ORDER BY price ASC"
+get_shipping_sql_weight = "SELECT * FROM ShippingMethod WHERE maxWeight > %s OR maxWeight IS NULL ORDER BY price ASC"
 get_price_sql = "SELECT price FROM ShippingMethod WHERE methodID = %s"
 
 
