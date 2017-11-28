@@ -47,11 +47,12 @@ def check_and_cache_cart_id(user_id):
     cart_id = None
     try:
         with get_db().cursor() as cursor:
-            cursor.execute(sql, user_id)
+            row_count = cursor.execute(sql, user_id)
             row = cursor.fetchone()
-            if not row:
+            if not row_count:
                 cursor.execute(create_cart, user_id)
                 cart_id = cursor.lastrowid
+                get_db().commit()
             else:
                 cart_id = row["cartID"]
             set_cart_id(cart_id)
