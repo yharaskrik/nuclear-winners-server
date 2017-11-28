@@ -1,6 +1,7 @@
 import io
 
-from flask import request, render_template, flash, url_for, redirect, send_file
+from flask import request, render_template, flash, url_for, redirect, send_file, current_app
+from pymysql import Error
 
 from app import app, get_db
 from .categories import fetch_categories
@@ -14,8 +15,8 @@ update_prod_sql_with_image = "UPDATE Product SET name = %s, description=%s, pric
 
 get_prod_sql = "SELECT sku, name, description, price, inventory, weight, visible, category FROM Product WHERE sku = %s"
 
-list_prod_sql = "SELECT * FROM Product"
-filter_prod_sql = "SELECT * FROM Product WHERE name LIKE %s"
+list_prod_sql = "SELECT * FROM Product WHERE visible = 1"
+filter_prod_sql = "SELECT * FROM Product WHERE Product.visible = 1 AND Product.name LIKE %s"
 
 
 @app.route("/products/", methods=['GET'])
@@ -31,10 +32,7 @@ def view_products(cid=None):
         args.append("%" + request.args["search"] + "%")
 
     if cid:
-        if search:
-            sql += " and category = %s"
-        else:
-            sql += " WHERE category = %s"
+        sql += " and category = %s"
         args.append(cid)
 
     with get_db().cursor() as cursor:
@@ -45,7 +43,6 @@ def view_products(cid=None):
 
 @app.route("/products/search/", methods=['GET'])
 def ajax_products():
-
     with get_db().cursor() as cursor:
 
         if 'search' in request.args:
@@ -224,3 +221,27 @@ def validate_product(data):
         valid = False
         flash("Category is required")
     return valid
+
+
+hot_products_sql = "SELECT P.sku, P.name, P.description, P.price, P.inventory, P.weight, P.visible, C.name AS catName, SUM(quantity) AS amountSold " \
+                   "FROM ShippedProduct SP JOIN Product P ON SP.sku = P.sku JOIN Category C ON P.category = C.id " \
+                   "WHERE P.visible = 1 " \
+                   "GROUP BY P.name, P.price, P.sku, P.inventory, P.weight, P.category, P.visible, P.description, C.name " \
+                   "ORDER BY SUM(quantity) DESC " \
+                   "LIMIT 6;"
+
+
+def get_hot_products():
+    """Retrieves the hot products from the database. This is the products with the most quantity sales
+
+    :returns And array containing the hot products
+    """
+
+    try:
+        with get_db().cursor() as cursor:
+            cursor.execute(hot_products_sql)
+            products = cursor.fetchall()
+            return products
+    except Error as e:
+        current_app.logger.error(e)
+        return []

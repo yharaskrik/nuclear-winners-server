@@ -1,8 +1,17 @@
 {% extends 'layout.html' %}
 {% block body %}
-    <h1><a href="{{ url_for("view_products") }}">View Products</a></h1>
-    {% if session.user_admin %}
-        <h1><a href="{{ url_for("admin") }}">Admin</a></h1>
-    {% endif %}
-    <a href="{{ url_for('view_categories') }}">List Categories</a>
+    <div class="row center-align">
+        <h2>Hot Products</h2>
+    </div>
+    {% with %}
+        {% set products = hot_products %}
+        <div id="productSection">
+            {% include 'product_cards.html' %}
+        </div>
+    {% endwith %}
+    <div class="center-align">
+        <p>
+            <a class="waves-effect waves-light btn" href="{{ url_for("view_products") }}">View All Products</a>
+        </p>
+    </div>
 {% endblock %}
