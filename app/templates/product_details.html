@@ -22,18 +22,24 @@
                             <td>{{ product.description }}</td>
                         </tr>
                     </table>
-                    <form id="add_to_cart_form" method="get" action="{{ url_for("add_to_cart", pid=product.sku) }}">
+                    {% if product.inventory > 0 %}
+                        <form id="add_to_cart_form" method="get" action="{{ url_for("add_to_cart", pid=product.sku) }}">
                         <div class="input-field inline">
                             <label for="quantity">Quantity:</label>
                             <input title="quantity" type="number" value="1" min="1" max="{{ product.inventory }}"
                                    name="quantity">
                         </div>
+                    {% endif %}
                     </form>
                 </div>
                 <div class="card-action">
-                    <a href="javascript:{}" id="addToCart" class="waves-effect waves-light btn"
-                       onclick="document.getElementById('add_to_cart_form').submit(); return false;"><i
-                            class="material-icons">add</i>Add to Cart</a>
+                    {% if product.inventory > 0 %}
+                        <a href="javascript:{}" id="addToCart" class="waves-effect waves-light btn"
+                           onclick="document.getElementById('add_to_cart_form').submit(); return false;"><i
+                                class="material-icons">add</i>Add to Cart</a>
+                    {% else %}
+                        <a href="#" id="addToCart" class="waves-effect waves-light btn disabled">Out of Stock</a>
+                    {% endif %}
                     {% if session.user_admin %}
                         <a class="waves-effect waves-light btn" href="{{ url_for('edit_product', sku=product.sku) }}">Edit</a>
                         <br>
