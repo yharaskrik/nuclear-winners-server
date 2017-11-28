@@ -43,6 +43,21 @@ def view_products(cid=None):
         return render_template("product_list.html", products=result, search=search, cid=cid)
 
 
+@app.route("/products/search/", methods=['GET'])
+def ajax_products():
+
+    with get_db().cursor() as cursor:
+
+        if 'search' in request.args:
+            cursor.execute(filter_prod_sql, '%' + request.args["search"] + '%')
+        else:
+            cursor.execute(list_prod_sql)
+
+        result = cursor.fetchall()
+
+        return render_template("product_cards.html", products=result, search=request.args["search"])
+
+
 @app.route("/product/<sku>")
 def view_product(sku):
     """Displays a products"""
