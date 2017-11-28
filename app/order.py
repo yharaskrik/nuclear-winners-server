@@ -15,10 +15,9 @@ from .views.user_login import requires_roles
 def checkout(data=None):
     if data is None:
         data = {"shippingMethod": "1"}
-    shipping = get_shipping_methods()
-    payment = get_payment_methods()
-    cart = get_cart()
 
+    cart = get_cart()
+    payment = get_payment_methods()
     total = 0
     total_weight = 0
 
@@ -27,6 +26,8 @@ def checkout(data=None):
         weight = item["weight"]
         if weight:
             total_weight += item["quantity"] * weight
+
+    shipping = get_shipping_methods(total_weight)
 
     return render_template("order.html", shipping=shipping, payment=payment, cart=cart, total=total,
                            weight=total_weight, data=data, tax=TAX_RATE)
@@ -89,9 +90,9 @@ def place_order():
                 cursor.execute(update_inventory, (item["quantity"], item["sku"]))
                 total += item['quantity'] * item["price"]
 
+            tax = int(round(total * TAX_RATE))
             shipping_price = get_shipping_method_price(data["shippingMethod"])
             total += shipping_price
-            tax = int(round(total * TAX_RATE))
             cursor.execute(update_order_total, (total + tax, order_id))
             cursor.execute(clear_cart, cart_id)
             get_db().commit()
@@ -159,6 +160,6 @@ def single_order(shipid):
         if not is_user_admin() and not get_user_id() == shipment["user_id"]:
             abort(403)
 
-        tax = int(round((product_total + shipment["shipment_price"]) * TAX_RATE))
+        tax = int(round(product_total * TAX_RATE))
 
         return render_template('single_order.html', data=data, sum=product_total, id=shipid, shipment=shipment, tax=tax)

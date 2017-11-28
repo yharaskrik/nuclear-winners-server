@@ -25,7 +25,7 @@ def add_to_cart(pid):
     As there are two types of carts the actually function used depends if the user is logged in or not.
     """
     # If there is no quantity specified by the call, it defaults to one
-    quantity = request.args.get("quantity", 1)
+    quantity = int(request.args.get("quantity", 1))
 
     # Get the current inventory for the product as it is needed for both calls.
     inventory = get_inventory_for_product(pid)
