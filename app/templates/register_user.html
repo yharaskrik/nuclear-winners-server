@@ -18,10 +18,10 @@
                                placeholder="Confirm Password"><br>
                         <input type="text" name="address" size="50" maxlength="200" value="{{ data['address'] }}"
                                placeholder="Enter Address"><br>
-                        <p><input type="checkbox" name="notrobot" id="robotCheck"><label for="robotCheck">I am not a robot:</label></p>
+                        <p><input type="checkbox" value="robot" name="robot" id="robotCheck"><label for="robotCheck">I am a robot:</label></p>
                     </div>
                     <div class="card-action">
-                        <a href="{{ url_for('views.login') }}">Log in</a>
+                        <a href="{{ url_for('login') }}">Log in</a>
                         <a href="#" id="submitButton">Register</a>
                     </div>
                 </form>

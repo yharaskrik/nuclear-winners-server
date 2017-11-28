@@ -138,7 +138,7 @@ def single_order(shipid):
           'FROM User, Product AS P, ShippedProduct AS S, Shipment ' \
           'WHERE User.id = Shipment.userID AND Shipment.shipmentID = S.shipmentID AND P.sku = S.sku AND S.shipmentID = %s'
 
-    order_sql = "SELECT S.userID AS user_id, S.paymentMethodID, S.total AS order_total, SM.methodName AS shipping_name, SM.price AS shipment_price " \
+    order_sql = "SELECT S.userID AS user_id, S.paymentMethodID, S.total AS order_total, SM.methodName AS shipping_name, SM.price AS shipment_price,S.status " \
                 "FROM Shipment S JOIN ShippingMethod SM ON S.shippingMethodID = SM.methodID " \
                 "WHERE shipmentID = %s"
 
