@@ -4,7 +4,7 @@
 from flask import request, render_template, session
 from werkzeug.security import generate_password_hash
 
-from . import get_db, app, requires_roles
+from . import get_db, app, requires_roles, redirect
 
 
 # allows users to create an account
@@ -58,7 +58,7 @@ def list_customers():
 def list_reports():
     sql = 'SELECT U.id, U.name, U.address, S.shipmentID, methodName, PaymentMethod.name AS payment, S.total ' \
           'FROM User AS U, Shipment AS S, ShippingMethod, PaymentMethod ' \
-          'WHERE U.id = S.userID AND S.shippingMethodID = ShippingMethod.methodID AND S.paymentMethodID = PaymentMethod.methodID AND S.status = %s'
+          'WHERE U.id = S.userID AND S.shippingMethodID = ShippingMethod.methodID AND S.paymentMethodID = PaymentMethod.methodID AND S.status = %s ORDER BY S.shipmentID'
 
     with get_db().cursor() as cursor:
         cursor.execute(sql, [0])
@@ -79,3 +79,13 @@ def list_reports():
                 finishedtotal += order['total']
         return render_template('list_reports.html', data=shipments, data2=finishedshipments, totalsum=total,
                                totalorders=orders, finishedsum=finishedtotal, finishedorders=finishedorders)
+
+
+@app.route('/admin/send/<int:shipid>/')
+@requires_roles('admin')
+def send_order(shipid):
+    sql = 'UPDATE Shipment SET status = 1 WHERE shipmentID = %s'
+    with get_db().cursor() as cursor:
+        cursor.execute(sql, shipid)
+        get_db().commit()
+    return redirect(request.referrer)
