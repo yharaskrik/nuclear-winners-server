@@ -6,11 +6,12 @@ try:
     import dbconfig
 except Exception:
     import os
-    db_host = os.environ.get('db_host', None)
-    db_user = os.environ.get('db_user', None)
-    db_password = os.environ.get('db_password', None)
-    db = os.environ.get('db', None)
-    db_charset = os.environ.get('db_charset', None)
+    dbconfig = None
+    dbconfig.db_host = os.environ.get('db_host', None)
+    dbconfig.db_user = os.environ.get('db_user', None)
+    dbconfig.db_password = os.environ.get('db_password', None)
+    dbconfig.db = os.environ.get('db', None)
+    dbconfig.db_charset = os.environ.get('db_charset', None)
 
 try:
     import pymysql
