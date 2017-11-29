@@ -56,9 +56,9 @@
                         </div>
                         <div class="col s6">
                             <ul class="right">
-                                <li><a href="{{ url_for('cart') }}">Cart</a>
+                                <li><a href="{{ url_for('cart') }}">Cart - (<span id="itemsInCart">0</span>)</a>
                                 </li>
-                                <li><a class="dropdown-button" href="#!" data-activates="dropdownMenu">Menu<i
+                                <li><a class="dropdown-button" href="#!" data-activates="dropdownMenu">Settings<i
                                         class="material-icons right">arrow_drop_down</i></a></li>
                             </ul>
                         </div>
@@ -91,6 +91,14 @@
 <script>
     $(document).ready(function () {
         $(".dropdown-content").dropdown();
+
+        $.ajax({
+            type: "GET",
+            url: "/order/cart/count/",
+            success: function (result) {
+                $('#itemsInCart').html(result);
+            }
+        })
     });
     document.getElementById("searchButton").onclick = function () {
         document.getElementById("makeSearch").submit();

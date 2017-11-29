@@ -1,4 +1,4 @@
-from flask import render_template, request, flash, url_for, redirect, abort
+from flask import render_template, request, flash, url_for, redirect, abort, Response
 
 from config import TAX_RATE
 from . import app
@@ -130,6 +130,10 @@ def get_cart():
             return cursor.fetchall()
     return
 
+@app.route('/order/cart/count/')
+@requires_roles('user')
+def cart_size():
+    return Response(str(len(get_cart())))
 
 @app.route('/order/details/<int:shipid>/')
 @requires_roles("user")
