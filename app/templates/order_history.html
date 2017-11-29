@@ -9,13 +9,15 @@
                         <td> Status</td>
                         <td> Shipment Method</td>
                         <td> Payment Method</td>
+                        <td> Shipment Status</td>
                     </tr>
                     {% for order in orders %}
                         <tr>
                             <td> {{ order.shipmentID }} </td>
                             <td> {{ order.status }} </td>
-                            <td> {{ order.shippingMethodID }} </td>
-                            <td> {{ order.paymentMethodID }} </td>
+                            <td> {{ order.methodName }} </td>
+                            <td> {{ order.name }} </td>
+                            <td> {{ order.status }} </td>
                             <td colspan=3>
                                 <table>
                                     <tr>
