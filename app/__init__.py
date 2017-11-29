@@ -6,7 +6,7 @@ try:
     import dbconfig
 except Exception:
     import os
-    dbconfig = None
+    dbconfig = lambda: None
     dbconfig.db_host = os.environ.get('db_host', None)
     dbconfig.db_user = os.environ.get('db_user', None)
     dbconfig.db_password = os.environ.get('db_password', None)
