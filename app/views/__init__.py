@@ -1,5 +1,7 @@
 from flask import Blueprint
 
+from app import app, get_db
+
 views = Blueprint('views', __name__)
 
 from .user_login import *
