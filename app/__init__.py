@@ -1,7 +1,16 @@
 from flask import Flask, g
 
 import config
-import dbconfig
+
+try:
+    import dbconfig
+except Exception:
+    import os
+    db_host = os.environ.get('db_host', None)
+    db_user = os.environ.get('db_user', None)
+    db_password = os.environ.get('db_password', None)
+    db = os.environ.get('db', None)
+    db_charset = os.environ.get('db_charset', None)
 
 try:
     import pymysql
