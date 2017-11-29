@@ -29,6 +29,13 @@
 </head>
 <body>
 <div class="page">
+    <ul id="dropdownMenu" class="dropdown-content">
+        <li><a href="{{ url_for('logout') }}"><i class="material-icons right">fingerprint</i>Log
+            Out</a></li>
+        <li><a href="{{ url_for('view_account') }}"><i
+                class="material-icons right">accessibility</i> {{ session.user_name }}
+        </a></li>
+    </ul>
     <nav>
         <div class="nav-wrapper">
             {% if not session.logged_in %}
@@ -39,31 +46,23 @@
                 </ul>
             {% else %}
                 <div class="row">
-                    <div class="col s5">
-                        <form method="get" action="{{ url_for("view_products") }}" id="makeSearch">
-                            <div class="input-field nav-search">
-                                <input id="searchBox" type="text" placeholder="Search for products" name="search"
-                                       value="{{ search }}">
-                            </div>
-                        </form>
-                    </div>
-                    <div class="col s2">
-                        <ul>
-                            <li><a href="#" id="searchButton"><i class="material-icons right">search</i>Search</a></li>
-                        </ul>
-                    </div>
-                    <div class="col s5">
-                        <ul class="right">
-                            <li><a href="{{ url_for('view_account') }}"><i
-                                    class="material-icons right">accessibility</i> {{ session.user_name }}
-                            </a></li>
-                            <li><a href="{{ url_for('logout') }}"><i class="material-icons right">fingerprint</i>Log
-                                Out</a></li>
-                            <li><a href="{{ url_for('cart') }}"><i
-                                    class="material-icons right">shopping-cart</i>Cart</a>
-                            </li>
-                        </ul>
-                    </div>
+                    <form method="get" action="{{ url_for("view_products") }}" id="makeSearch">
+                        <div class="input-field nav-search col s5">
+                            <input id="searchBox" type="text" placeholder="Search for products" name="search"
+                                   value="{{ search }}">
+                            <a href="#" id="searchButton"><i class="material-icons right">search</i></a>
+                        </div>
+                        <div class="col s1">
+                        </div>
+                        <div class="col s6">
+                            <ul class="right">
+                                <li><a href="{{ url_for('cart') }}">Cart</a>
+                                </li>
+                                <li><a class="dropdown-button" href="#!" data-activates="dropdownMenu">Menu<i
+                                        class="material-icons right">arrow_drop_down</i></a></li>
+                            </ul>
+                        </div>
+                    </form>
                 </div>
             {% endif %}
         </div>
@@ -90,6 +89,9 @@
 </div>
 
 <script>
+    $(document).ready(function () {
+        $(".dropdown-content").dropdown();
+    });
     document.getElementById("searchButton").onclick = function () {
         document.getElementById("makeSearch").submit();
     };
@@ -97,15 +99,15 @@
         console.log('Search Changed');
         if ($('#productSection')) {
             console.log('Is Product Section');
-           $.ajax({
-            type: "GET",
-            url: "/products/search/?search=" + $('#searchBox').val(),
-            success: function (result) {
-                console.log('Success');
-                console.log(result);
-                $('#productSection').html(result);
-            }
-        })
+            $.ajax({
+                type: "GET",
+                url: "/products/search/?search=" + $('#searchBox').val(),
+                success: function (result) {
+                    console.log('Success');
+                    console.log(result);
+                    $('#productSection').html(result);
+                }
+            })
         }
     })
 </script>
