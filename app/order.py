@@ -5,7 +5,7 @@ from . import app
 from . import get_db
 from .payment_methods import get_payment_methods
 from .shipping import get_shipping_methods, get_shipping_method_price
-from .util import get_user_id, is_user_admin
+from .util import get_user_id, is_user_admin, get_user_object
 from .views.cart import validate_inventory
 from .views.user_login import requires_roles
 
@@ -166,4 +166,4 @@ def single_order(shipid):
 
         tax = int(round(product_total * TAX_RATE))
 
-        return render_template('single_order.html', data=data, sum=product_total, id=shipid, shipment=shipment, tax=tax)
+        return render_template('single_order.html', data=data, sum=product_total, id=shipid, shipment=shipment, tax=tax, user=get_user_object())

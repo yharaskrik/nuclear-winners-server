@@ -3,7 +3,7 @@ import io
 from flask import request, render_template, flash, url_for, redirect, send_file, current_app
 from pymysql import Error
 
-from app import app, get_db
+from app import app, get_db, get_user_object
 from .categories import fetch_categories
 from .views.user_login import requires_roles
 
@@ -38,12 +38,12 @@ def view_products(cid=None):
     with get_db().cursor() as cursor:
         cursor.execute(sql, args)
         result = cursor.fetchall()
-        return render_template("product_list.html", products=result, search=search, cid=cid)
+        return render_template("product_list.html", products=result, search=search, cid=cid, user=get_user_object())
 
 
 @app.route("/products/search/", methods=['GET'])
 def ajax_products():
-    
+
     with get_db().cursor() as cursor:
 
         if 'search' in request.args:
@@ -53,7 +53,7 @@ def ajax_products():
 
         result = cursor.fetchall()
 
-        return render_template("product_cards.html", products=result, search=request.args["search"])
+        return render_template("product_cards.html", products=result, search=request.args["search"], user=get_user_object())
 
 
 @app.route("/product/<sku>")
@@ -66,7 +66,7 @@ def view_product(sku):
             return render_template("product_details.html", product=product)
     except Exception as e:
         app.log_exception(e)
-    return render_template("error.html", msg="Unable to display the product")
+    return render_template("error.html", msg="Unable to display the product", user=get_user_object())
 
 
 @app.route("/product/<int:sku>/edit", methods=['post', 'get'])
@@ -81,14 +81,14 @@ def edit_product(sku):
             if not result:
                 return render_template("error.html", msg="Unable to retrieve product details")
             result["showInStore"] = "1" if result["visible"] == 1 else ''
-            return render_template("edit_product.html", data=result, categories=fetch_categories())
+            return render_template("edit_product.html", data=result, categories=fetch_categories(), user=get_user_object())
 
     # Validate and submit
     data = request.form
     args = prepare_product_insert_data(data)
 
     if not args:
-        return render_template("edit_product.html", data=data)
+        return render_template("edit_product.html", data=data, user=get_user_object())
 
     sql = update_prod_sql_no_image
 
@@ -110,19 +110,19 @@ def edit_product(sku):
     except Exception as e:
         print(e)
     flash("Unable to Edit product")
-    return render_template("edit_product.html", data=data)
+    return render_template("edit_product.html", data=data, user=get_user_object())
 
 
 @app.route("/product/add", methods=['post', 'get'])
 @requires_roles('admin')
 def add_product():
     if request.method == 'GET':
-        return render_template("add_product.html", data={}, categories=fetch_categories())
+        return render_template("add_product.html", data={}, categories=fetch_categories(), user=get_user_object())
 
     args = prepare_product_insert_data(request.form)
 
     if not args:
-        return render_template("add_product.html", data=request.form)
+        return render_template("add_product.html", data=request.form, user=get_user_object())
 
     sql = create_prod_sql_no_image
 
@@ -141,7 +141,7 @@ def add_product():
     except Exception as e:
         print(e)
     flash("Unable to create product")
-    return render_template("add_product.html", data=request.form)
+    return render_template("add_product.html", data=request.form, user=get_user_object())
 
 
 @app.route("/product/<int:sku>/image.jpg")

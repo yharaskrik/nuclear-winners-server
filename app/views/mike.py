@@ -1,6 +1,6 @@
 from flask import jsonify, render_template, session
 
-from . import get_db, app
+from . import get_db, app, get_user_object
 
 
 @app.route('/account')
@@ -44,4 +44,4 @@ def order_history():
                 order['products'] = cursor.fetchall()
                 #add the total prices together to make a subtotal
 
-            return render_template('order_history.html', orders=orders)
+            return render_template('order_history.html', orders=orders, user=get_user_object())
