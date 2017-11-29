@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, flash, url_for
 
-from . import app, get_db, get_user_object
+from . import app, get_db
+from .util import get_user_object
 from .views.user_login import requires_roles
 
 

@@ -3,7 +3,8 @@ import io
 from flask import request, render_template, flash, url_for, redirect, send_file, current_app
 from pymysql import Error
 
-from app import app, get_db, get_user_object
+from app import app, get_db
+from app.util import get_user_object
 from .categories import fetch_categories
 from .views.user_login import requires_roles
 
@@ -63,7 +64,7 @@ def view_product(sku):
         with get_db().cursor() as cursor:
             cursor.execute(get_prod_sql, int(sku))
             product = cursor.fetchone()
-            return render_template("product_details.html", product=product)
+            return render_template("product_details.html", product=product, user=get_user_object())
     except Exception as e:
         app.log_exception(e)
     return render_template("error.html", msg="Unable to display the product", user=get_user_object())

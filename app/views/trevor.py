@@ -4,7 +4,7 @@
 from flask import request, render_template, session
 from werkzeug.security import generate_password_hash
 
-from app import get_user_object
+from app.util import get_user_object
 from . import get_db, app, requires_roles, redirect
 
 

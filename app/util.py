@@ -59,5 +59,6 @@ def get_user_object():
     with get_db().cursor() as cursor:
         cursor.execute(sql, session['user_id'])
         user = cursor.fetchone()
+        print(user)
         return user
-    return None;
+    return None

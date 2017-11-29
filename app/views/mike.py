@@ -1,6 +1,8 @@
 from flask import jsonify, render_template, session
 
-from . import get_db, app, get_user_object
+from . import get_db, app
+
+from app.util import get_user_object
 
 
 @app.route('/account')
