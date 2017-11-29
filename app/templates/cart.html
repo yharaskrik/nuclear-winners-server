@@ -16,14 +16,12 @@
                     <div class="row">
                         <div class="col s6 input-field">
                             <form method="get" action="{{ url_for("update_cart", pid=item.sku) }}" id="quantityBox">
-                                <input min='1' type="number" name="quantity" value="{{ item.quantity }}">
+                                <input id="quantityInput" min='1' type="number" name="quantity" value="{{ item.quantity }}">
                             </form>
 
                             <a class="waves-effect waves-light btn"
                                href="{{ url_for('delete_from_cart', pid=item.sku) }}">Remove</a>
-                            <a class="waves-effect waves-light btn" href="" id="updateButton" onclick="function updateQuantity() {
-                            $('#quantityBox').submit();
-                        }">Update</a>
+                            <a class="waves-effect waves-light btn" href="#" id="updateButton" onclick="updateQuantity()">Update</a>
                         </div>
                     </div>
 
@@ -45,4 +43,18 @@
             </div>
         </div>
     </div>
+    <script>
+        function updateQuantity() {
+                                console.log('Updating quantity()')
+                                $('#quantityBox').submit();
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '/order/cart/count/',
+                                    success: function (result) {
+                                        $('#itemsInCart').html(result);
+                                        $('#quantityInput').html(result);
+                                    }
+                                })
+                            }
+    </script>
 {% endblock %}
