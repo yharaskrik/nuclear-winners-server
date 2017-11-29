@@ -1,22 +1,79 @@
 {% extends "layout.html" %}
 {% block body %}
-    <form enctype="multipart/form-data" method="post" action="/product/{{ data.sku }}/edit">
-        <input type="hidden" name="sku" value="{{ data.sku }}">
-        Name: <input type="text" name="name" placeholder="Product Name" value="{{ data.name }}"/><br>
-        Description: <input type="text" name="description" placeholder="Description"
-                            value="{{ data.description }}"/><br>
-        Price: <input type="number" name="price" step="1" value="{{ data.price }}"/><br>
-        Weight: <input type="number" name="weight" step="any" value="{{ data.weight }}"><br>
-        Inventory: <input type="number" name="inventory" step="1" value="{{ data.inventory }}"><br>
-        Image: <input type="file" name="image" accept="image/*"/><br>
-        <label for="category">Category: </label>
-        <select name="category" title="Category">
-            {% for cat in categories %}
-                <option value="{{ cat.id }}" {{ "selected=\"selected\"" if cat.id == data.category }}>{{ cat.name }}</option>
-            {% endfor %}
-        </select><br>
-        <label for="showInStore">Show in Store</label><input type="checkbox" name="showInStore"
-                                                             value="1" {{ "checked=checked" if data.showInStore == '1' else "" }} >
-        <input type="submit" name="Submit`">
-    </form>
+
+    <div class="card">
+        <div class="card-content">
+            <div class="row">
+                <form enctype="multipart/form-data" method="post" action="/product/{{ data.sku }}/edit">
+                    <div class="row">
+                        <div class="input-field">
+                            <input id="sku" type="hidden" name="sku" value="{{ data.sku }}" />
+                            <label for="sku">SKU</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <input id="name" type="text" name="name" placeholder="Product Name" value="{{ data.name }}"/>
+                            <label for="name">Name</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <input id="description" type="text" name="description" placeholder="Description"
+                                                value="{{ data.description }}"/>
+                            <label for="description">Description</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <input id="price" type="number" name="price" step="1" value="{{ data.price }}"/>
+                            <label for="price">Price</label>
+                        </div>
+                        <div class="row">
+                            <div class="input-field">
+                                <input id="weight" type="number" name="weight" step="any" value="{{ data.weight }}" />
+                                <label for="weight">Weight</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field">
+                                <input id="inventory" type="number" name="inventory" step="1"
+                                                  value="{{ data.inventory }}" />
+                                <label for="inventory">Inventory</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field">
+                                Image: <input type="file" name="image" accept="image/*"/><br>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field">
+                                <select name="category" title="Category">
+                                    {% for cat in categories %}
+                                        <option value="{{ cat.id }}" {{ "selected=\"selected\"" if cat.id == data.category }}>{{ cat.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label>Category</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <p>
+                                <input id="showInStore"
+                                       type="checkbox"
+                                       name="showInStore"
+                                       value="1" {{ "checked=checked" if data.showInStore == '1' else "" }} />
+                                <label for="showInStore">Show in Store</label>
+                            </p>
+                        </div>
+                        <div class="row">
+                            <div class="input-field">
+                                <input type="submit" name="Submit`">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}
