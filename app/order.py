@@ -130,10 +130,12 @@ def get_cart():
             return cursor.fetchall()
     return
 
+
 @app.route('/order/cart/count/')
 @requires_roles('user')
 def cart_size():
     return Response(str(len(get_cart())))
+
 
 @app.route('/order/details/<int:shipid>/')
 @requires_roles("user")
@@ -166,4 +168,5 @@ def single_order(shipid):
 
         tax = int(round(product_total * TAX_RATE))
 
-        return render_template('single_order.html', data=data, sum=product_total, id=shipid, shipment=shipment, tax=tax, user=get_user_object())
+        return render_template('single_order.html', data=data, sum=product_total, id=shipid, shipment=shipment, tax=tax,
+                               user=get_user_object())

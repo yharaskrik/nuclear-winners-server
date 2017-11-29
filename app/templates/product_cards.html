@@ -1,20 +1,22 @@
 <div class="row">
-        {% for item in products %}
+    {% for item in products %}
         <div class="col s2">
             <div class="card center-align large">
                 <div class="card-image">
-                    <a href="{{ url_for('view_product', sku=item.sku) }}"><img src="{{ url_for('product_picture',sku=item.sku) }}" width="50"></a>
+                    <a href="{{ url_for('view_product', sku=item.sku) }}"><img
+                            src="{{ url_for('product_picture',sku=item.sku) }}" width="50"></a>
                 </div>
-                <span class="card-title"><a class="center-align" style="display: block;" href="{{ url_for('view_product', sku=item.sku) }}">{{ item.name }}</a></span>
+                <span class="card-title"><a class="center-align" style="display: block;"
+                                            href="{{ url_for('view_product', sku=item.sku) }}">{{ item.name }}</a></span>
 
                 <div class="card-content">
                     <a href="{{ url_for('view_product', sku=item.sku) }}" style="display:block; color: #000000;">
-                    <p>
-                        {{ item.description }}<br>
-                    </p>
-                    <p class="left-align">
-                        <i class="material-icons left">stars</i>{{ item.price }} caps
-                    </p>
+                        <p>
+                            {{ item.description }}<br>
+                        </p>
+                        <p class="left-align">
+                            <i class="material-icons left">stars</i>{{ item.price }} caps
+                        </p>
                     </a>
                 </div>
                 <div class="card-action green darken-4">
@@ -24,4 +26,4 @@
             </div>
         </div>
     {% endfor %}
-    </div>
+</div>

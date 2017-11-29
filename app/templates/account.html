@@ -7,13 +7,13 @@
                     <span class="card-title">{{ user.name }}</span>
                     <p>Faction: {{ user.faction }}<br>Address: {{ user.address }}<br><br></p>
 
-                        {% for mutation in mutations %}
-                            <div class="chip">
-                                {{ mutation.name }}
-                            </div>
-                        {% endfor %}
+                    {% for mutation in mutations %}
+                        <div class="chip">
+                            {{ mutation.name }}
+                        </div>
+                    {% endfor %}
                 </div>
-          <div class="card-action">
+                <div class="card-action">
                     <a href="/account/orders">Order History</a>
                 </div>
             </div>

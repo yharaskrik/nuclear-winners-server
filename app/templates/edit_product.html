@@ -7,20 +7,21 @@
                 <form enctype="multipart/form-data" method="post" action="/product/{{ data.sku }}/edit">
                     <div class="row">
                         <div class="input-field">
-                            <input id="sku" type="hidden" name="sku" value="{{ data.sku }}" />
+                            <input id="sku" type="hidden" name="sku" value="{{ data.sku }}"/>
                             <label for="sku">SKU</label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="input-field">
-                            <input id="name" type="text" name="name" placeholder="Product Name" value="{{ data.name }}"/>
+                            <input id="name" type="text" name="name" placeholder="Product Name"
+                                   value="{{ data.name }}"/>
                             <label for="name">Name</label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="input-field">
                             <input id="description" type="text" name="description" placeholder="Description"
-                                                value="{{ data.description }}"/>
+                                   value="{{ data.description }}"/>
                             <label for="description">Description</label>
                         </div>
                     </div>
@@ -31,14 +32,14 @@
                         </div>
                         <div class="row">
                             <div class="input-field">
-                                <input id="weight" type="number" name="weight" step="any" value="{{ data.weight }}" />
+                                <input id="weight" type="number" name="weight" step="any" value="{{ data.weight }}"/>
                                 <label for="weight">Weight</label>
                             </div>
                         </div>
                         <div class="row">
                             <div class="input-field">
                                 <input id="inventory" type="number" name="inventory" step="1"
-                                                  value="{{ data.inventory }}" />
+                                       value="{{ data.inventory }}"/>
                                 <label for="inventory">Inventory</label>
                             </div>
                         </div>
@@ -68,7 +69,7 @@
                         </div>
                         <div class="row">
                             <div class="input-field">
-                                <input type="submit" name="Submit`">
+                                <input type="submit" name="Submit">
                             </div>
                         </div>
                     </div>

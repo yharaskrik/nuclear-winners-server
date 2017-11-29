@@ -1,7 +1,7 @@
 # @app.route('/get/Product/<type:param>')
 # def name(param)
 
-from flask import request, render_template, session
+from flask import request, render_template
 from werkzeug.security import generate_password_hash
 
 from app.util import get_user_object
@@ -79,7 +79,8 @@ def list_reports():
             if order['total']:
                 finishedtotal += order['total']
         return render_template('list_reports.html', data=shipments, data2=finishedshipments, totalsum=total,
-                               totalorders=orders, finishedsum=finishedtotal, finishedorders=finishedorders, user=get_user_object())
+                               totalorders=orders, finishedsum=finishedtotal, finishedorders=finishedorders,
+                               user=get_user_object())
 
 
 @app.route('/admin/send/<int:shipid>/')

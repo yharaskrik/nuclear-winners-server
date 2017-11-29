@@ -44,7 +44,6 @@ def view_products(cid=None):
 
 @app.route("/products/search/", methods=['GET'])
 def ajax_products():
-
     with get_db().cursor() as cursor:
 
         if 'search' in request.args:
@@ -54,7 +53,8 @@ def ajax_products():
 
         result = cursor.fetchall()
 
-        return render_template("product_cards.html", products=result, search=request.args["search"], user=get_user_object())
+        return render_template("product_cards.html", products=result, search=request.args["search"],
+                               user=get_user_object())
 
 
 @app.route("/product/<sku>")
@@ -82,7 +82,8 @@ def edit_product(sku):
             if not result:
                 return render_template("error.html", msg="Unable to retrieve product details")
             result["showInStore"] = "1" if result["visible"] == 1 else ''
-            return render_template("edit_product.html", data=result, categories=fetch_categories(), user=get_user_object())
+            return render_template("edit_product.html", data=result, categories=fetch_categories(),
+                                   user=get_user_object())
 
     # Validate and submit
     data = request.form
