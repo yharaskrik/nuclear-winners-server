@@ -43,6 +43,7 @@ def view_products(cid=None):
 
 @app.route("/products/search/", methods=['GET'])
 def ajax_products():
+    
     with get_db().cursor() as cursor:
 
         if 'search' in request.args:

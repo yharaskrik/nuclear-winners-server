@@ -56,8 +56,12 @@
                         </div>
                         <div class="col s6">
                             <ul class="right">
+                                <li><a href="/">Home</a></li>
                                 <li><a href="{{ url_for('cart') }}">Cart - (<span id="itemsInCart">0</span>)</a>
                                 </li>
+                                {% if user and user.accountType == 1 %}
+                                    <li><a href="{{ url_for('admin') }}">Admin</a></li>
+                                {% endif %}
                                 <li><a class="dropdown-button" href="#!" data-activates="dropdownMenu">Settings<i
                                         class="material-icons right">arrow_drop_down</i></a></li>
                             </ul>
