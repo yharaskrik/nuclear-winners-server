@@ -1,11 +1,11 @@
-from flask import render_template, request, flash, url_for, redirect, abort
+from flask import render_template, request, flash, url_for, redirect, abort, Response
 
 from config import TAX_RATE
 from . import app
 from . import get_db
 from .payment_methods import get_payment_methods
 from .shipping import get_shipping_methods, get_shipping_method_price
-from .util import get_user_id, is_user_admin
+from .util import get_user_id, is_user_admin, get_user_object
 from .views.cart import validate_inventory
 from .views.user_login import requires_roles
 
@@ -131,6 +131,12 @@ def get_cart():
     return
 
 
+@app.route('/order/cart/count/')
+@requires_roles('user')
+def cart_size():
+    return Response(str(len(get_cart())))
+
+
 @app.route('/order/details/<int:shipid>/')
 @requires_roles("user")
 def single_order(shipid):
@@ -162,4 +168,5 @@ def single_order(shipid):
 
         tax = int(round(product_total * TAX_RATE))
 
-        return render_template('single_order.html', data=data, sum=product_total, id=shipid, shipment=shipment, tax=tax)
+        return render_template('single_order.html', data=data, sum=product_total, id=shipid, shipment=shipment, tax=tax,
+                               user=get_user_object())

@@ -1,7 +1,17 @@
 from flask import Flask, g
 
 import config
-import dbconfig
+
+try:
+    import dbconfig
+except Exception:
+    import os
+    dbconfig = lambda: None
+    dbconfig.db_host = os.environ.get('db_host', None)
+    dbconfig.db_user = os.environ.get('db_user', None)
+    dbconfig.db_password = os.environ.get('db_password', None)
+    dbconfig.db = os.environ.get('db', None)
+    dbconfig.db_charset = os.environ.get('db_charset', None)
 
 try:
     import pymysql
@@ -10,7 +20,7 @@ try:
 except ImportError:
     pass
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 app.config.from_object(config)
 
 

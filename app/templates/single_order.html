@@ -5,8 +5,9 @@
             <div class="card">
                 <div class="card-title center-align">
                     <h3>Shipment ID: {{ id }} {% if session["user_admin"] %} {{ data['user'] }} {% endif %} Total
-                        Value: {{ sum }} {% if session["user_admin"] and shipment.status == 0 %}<a href="{{ url_for('send_order',shipid=id) }}"
-                                            class="waves-effect waves-light btn">Submit</a>{% endif %}</h3>
+                        Value: {{ sum }} {% if session["user_admin"] and shipment.status == 0 %}
+                            <a href="{{ url_for('send_order',shipid=id) }}"
+                               class="waves-effect waves-light btn">Submit</a>{% endif %}</h3>
                 </div>
                 <div class="card-content">
                     <table border="1" class="bordered highlight">

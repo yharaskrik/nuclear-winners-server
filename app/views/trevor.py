@@ -1,9 +1,10 @@
 # @app.route('/get/Product/<type:param>')
 # def name(param)
 
-from flask import request, render_template, session
+from flask import request, render_template
 from werkzeug.security import generate_password_hash
 
+from app.util import get_user_object
 from . import get_db, app, requires_roles, redirect
 
 
@@ -49,7 +50,7 @@ def list_customers():
     with get_db().cursor() as cursor:
         cursor.execute(sql)
         data = cursor.fetchall()
-        return render_template('list_customers.html', data=data)
+        return render_template('list_customers.html', data=data, user=get_user_object())
     return 'picnic'
 
 
@@ -78,7 +79,8 @@ def list_reports():
             if order['total']:
                 finishedtotal += order['total']
         return render_template('list_reports.html', data=shipments, data2=finishedshipments, totalsum=total,
-                               totalorders=orders, finishedsum=finishedtotal, finishedorders=finishedorders)
+                               totalorders=orders, finishedsum=finishedtotal, finishedorders=finishedorders,
+                               user=get_user_object())
 
 
 @app.route('/admin/send/<int:shipid>/')

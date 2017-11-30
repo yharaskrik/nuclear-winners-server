@@ -1,7 +1,7 @@
 from flask import render_template, session, request, redirect, flash, current_app
 from pymysql import Error
 
-from app.util import is_logged_in, get_cart_id
+from app.util import is_logged_in, get_cart_id, get_user_object
 from . import get_db, app as app
 
 
@@ -94,7 +94,7 @@ def view_user_cart():
             # add up the subtotal
             for item in cart_products:
                 subtotal += item['total']
-            return render_template('cart.html', cart=cart_products, subtotal=subtotal)
+            return render_template('cart.html', cart=cart_products, subtotal=subtotal, user=get_user_object())
 
 
 def view_session_cart():
@@ -114,7 +114,7 @@ def view_session_cart():
                 item['quantity'] = session_cart[str(item['sku'])]
                 item['total'] = item['price'] * item['quantity']
                 subtotal += item['total']
-        return render_template('cart.html', cart=cart_products, subtotal=subtotal)
+        return render_template('cart.html', cart=cart_products, subtotal=subtotal, user=get_user_object())
 
 
 def add_product_to_session_cart(sku, quantity, inventory):
