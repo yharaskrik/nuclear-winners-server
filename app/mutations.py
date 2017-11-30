@@ -2,8 +2,13 @@ from flask import current_app
 from pymysql import Error
 
 from . import get_db
+from .util import get_user_id
 
 get_mutations_sql = "SELECT name, id FROM Mutation"
+get_user_mutations_sql = "SELECT Mutation.id FROM Mutation JOIN UserMutation ON Mutation.id = UserMutation.mutationID " \
+                         "WHERE userID = %s"
+delete_mutations_sql = "DELETE FROM UserMutation WHERE userID = %s"
+sql = "INSERT INTO UserMutation(userID, mutationID) VALUES (%s, %s)"
 
 
 def get_mutations():
@@ -17,7 +22,17 @@ def get_mutations():
         return list()
 
 
-delete_mutations_sql = "DELETE FROM UserMutation WHERE userID = %s"
+def get_user_mutations():
+    """Returns a list of ids of mutations that the user has"""
+    try:
+        with get_db().cursor() as cursor:
+            cursor.execute(get_user_mutations_sql, get_user_id())
+            mutations = cursor.fetchall()
+
+            return [m["id"] for m in mutations]
+    except Error as e:
+        current_app.logger.error(e)
+        return list()
 
 
 def set_mutations(user_id, mutations):
@@ -32,12 +47,11 @@ def set_mutations(user_id, mutations):
     """
     try:
         with get_db().cursor() as cursor:
-            cursor.execute(delete_mutations_sql)
+            cursor.execute(delete_mutations_sql, user_id)
             args = [(user_id, mid) for mid in mutations]
-            cursor.executemany(
-                "INSERT INTO UserMutation(mutationID, userID) VALUES (%s)" % ",".join(["%s"] * len(mutations)), args)
+            cursor.executemany(sql, args)
             get_db().commit()
             return True
     except Error as e:
-        current_app.logger.error(e)
+        current_app.logger.error("Mutations" + str(e) + " " + cursor._last_executed)
         return False

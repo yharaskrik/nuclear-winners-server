@@ -44,24 +44,28 @@ def register_user():
                                  generate_password_hash(data['password'], method='pbkdf2:sha256', salt_length=8),
                                  data['address'], data['username'], data.get("faction")))
             user_id = cursor.lastrowid
+            print("Staring mutations")
             mutation_ids = request.form.getlist('mutations')
-
             if data.get('robot', "") == 'robot':
                 mutation_ids.append("1")
 
+
             if mutation_ids:
+                print("Calling mutations")
                 set_mutations(user_id, mutation_ids)
 
             # Create a cart for this user
+            print("Creating cart")
             cursor.execute('INSERT INTO Cart(userID) VALUES (%s)', user_id)
 
+            print("Committing user account")
             get_db().commit()
 
         flash("Account created", "success")
         return redirect(url_for("login"))
     except Exception as e:
         current_app.logger.error(e)
-        flash('This username already exists', "error")
+        flash('Unable to create your account. Please try again with a different user name', "error")
         return render_template('register_user.html', data=data, mutations=mutations)
 
 

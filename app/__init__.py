@@ -76,3 +76,4 @@ def main_page(path):
 
 from .order import *
 from .mutations import get_mutations
+from .account import *
