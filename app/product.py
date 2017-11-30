@@ -95,10 +95,12 @@ def edit_product(sku):
     sql = update_prod_sql_no_image
 
     if request.files and 'image' in request.files:
-        sql = update_prod_sql_with_image
+        print(request.files)
         filename = request.files['image'].filename
-        mime_type = request.files['image'].mimetype
-        args.append(fix_image(request.files['image'].stream))
+        if filename:
+            mime_type = request.files['image'].mimetype
+            sql = update_prod_sql_with_image
+            args.append(fix_image(request.files['image'].stream))
 
     args.append(sku)
 
@@ -128,11 +130,12 @@ def add_product():
     sql = create_prod_sql_no_image
 
     if request.files and 'image' in request.files:
-        sql = create_prod_sql_with_image
         filename = request.files['image'].filename
-        mime_type = request.files['image'].mimetype
-        file = fix_image(request.files['image'].stream)
-        args.append(file)
+        if filename:
+            sql = create_prod_sql_with_image
+            mime_type = request.files['image'].mimetype
+            file = fix_image(request.files['image'].stream)
+            args.append(file)
     try:
         with get_db().cursor() as cursor:
             rows = cursor.execute(sql, args)
