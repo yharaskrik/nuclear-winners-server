@@ -164,18 +164,22 @@
 
 </div>
 
-<div class="content container" style="clear: both">
-    <div class="flash">
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul class=flashes>
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-    </div>
+    <div class="content container" style="clear: both">
+        <div class="flash">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class="flashes collection">
+                        {% for category, message in messages %}
+                            {% if category == 'error' %}
+                                <li class="collection-item center-align red">{{ message }}</li>
+                            {% else %}
+                                <li class="collection-item center-align green">{{ message }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
 
     {% block body %}{% endblock %}
 </div>

@@ -23,16 +23,16 @@ def add_category():
     # Validates the name is not empty
     name = request.form['name']
     if not name:
-        flash("Name cannot be empty")
+        flash("Name cannot be empty", "error")
         # Reshow the form
         return render_template("add_edit_category.html", data=request.form, user=get_user_object())
 
     if insert_category(name):
-        flash("Created category " + name)
+        flash("Created category " + name, "success")
         return redirect(url_for("manage_categories"))
     else:
         # An error occurred
-        flash("Unable to create category. Please try again")
+        flash("Unable to create category. Please try again", "error")
         return render_template("add_edit_category.html", data=request.form, user=get_user_object())
 
 
@@ -47,13 +47,13 @@ def edit_category(catID):
 
     name = request.form['name']
     if not name:
-        flash("Name cannot be empty")
+        flash("Name cannot be empty", "error")
         return render_template("add_edit_category.html", data=request.form, user=get_user_object())
 
     if update_category(catID, name):
-        flash("Updated category name to " + name)
+        flash("Updated category name to " + name, "success")
         return redirect(url_for("manage_categories"))
-    flash("Could not update the category name. Please try again")
+    flash("Could not update the category name. Please try again", "error")
     return render_template("add_edit_category.html", data=request.form, user=get_user_object())
 
 

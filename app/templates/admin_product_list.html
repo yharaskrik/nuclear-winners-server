@@ -1,0 +1,34 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <div style="background: white;">
+        <table class="striped">
+            <tr>
+                <td></td>
+                <th>sku</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Weight</th>
+                <th>Inventory</th>
+                <th>Visible</th>
+                <th>Category</th>
+                <th></th>
+            </tr>
+            {% for prod in products %}
+                <tr>
+                    <td><img src="{{ url_for("product_picture", sku=prod.sku) }}" width="50" height="50"/></td>
+                    <td>{{ prod.sku }}</td>
+                    <td>{{ prod.name }}</td>
+                    <td>{{ prod.description }}</td>
+                    <td>{{ prod.price }}</td>
+                    <td>{{ prod.weight }}</td>
+                    <td>{{ prod.inventory }}</td>
+                    <td><i class="material-icons">{{ "visibility" if prod.visible == 1 else "visibility_off" }}</i></td>
+                    <td>{{ prod.cat_name }}</td>
+                    <td><a href="{{ url_for("edit_product", sku=prod.sku) }}"><i class="material-icons">edit</i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

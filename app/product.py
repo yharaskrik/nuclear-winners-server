@@ -121,11 +121,12 @@ def edit_product(sku):
     sql = update_prod_sql_no_image
 
     if request.files and 'image' in request.files:
-        sql = update_prod_sql_with_image
+        print(request.files)
         filename = request.files['image'].filename
-        mime_type = request.files['image'].mimetype
-        file = request.files['image'].stream.read()
-        args.append(file)
+        if filename:
+            mime_type = request.files['image'].mimetype
+            sql = update_prod_sql_with_image
+            args.append(fix_image(request.files['image'].stream))
 
     args.append(sku)
 
@@ -133,11 +134,11 @@ def edit_product(sku):
         with get_db().cursor() as cursor:
             cursor.execute(sql, args)
             get_db().commit()
-            flash("Updated product")
+            flash("Updated product", "success")
             return redirect(url_for("view_product", sku=sku))
     except Exception as e:
         print(e)
-    flash("Unable to Edit product")
+    flash("Unable to Edit product", "error")
     return render_template("edit_product.html", data=data, user=get_user_object())
 
 
@@ -155,11 +156,12 @@ def add_product():
     sql = create_prod_sql_no_image
 
     if request.files and 'image' in request.files:
-        sql = create_prod_sql_with_image
         filename = request.files['image'].filename
-        mime_type = request.files['image'].mimetype
-        file = request.files['image'].stream.read()
-        args.append(file)
+        if filename:
+            sql = create_prod_sql_with_image
+            mime_type = request.files['image'].mimetype
+            file = fix_image(request.files['image'].stream)
+            args.append(file)
     try:
         with get_db().cursor() as cursor:
             rows = cursor.execute(sql, args)
@@ -168,17 +170,38 @@ def add_product():
                 return redirect(url_for("view_product", sku=cursor.lastrowid))
     except Exception as e:
         print(e)
-    flash("Unable to create product")
+    flash("Unable to create product", "success")
     return render_template("add_product.html", data=request.form, user=get_user_object())
 
 
-@app.route("/product/<int:sku>/image.jpg")
+from PIL import Image
+
+
+@app.route("/product/<int:sku>/image.png")
 def product_picture(sku):
     """Retrieves a product image from the database and server it as an image file"""
     sql = "SELECT image FROM Product WHERE sku = %s"
     with get_db().cursor() as cursor:
         cursor.execute(sql, sku)
-        return send_file(io.BytesIO(cursor.fetchone()["image"]), mimetype="image/jpeg")
+        return send_file(io.BytesIO(cursor.fetchone()["image"]), mimetype="image/png")
+
+
+def fix_image(image_file):
+    """
+    See: https://stackoverflow.com/a/1386382/7459703
+    :param image_file: The file stream containing the image.
+    :return: The image bytes for the new photo
+    """
+    size = (300, 300)
+    image = Image.open(image_file)
+    image.thumbnail(size, Image.ANTIALIAS)
+    background = Image.new('RGBA', size, (255, 255, 255, 0))
+    background.paste(
+        image, (int((size[0] - image.size[0]) / 2), int((size[1] - image.size[1]) / 2))
+    )
+    stream = io.BytesIO()
+    background.save(stream, format="PNG")
+    return stream.getvalue()
 
 
 def product_visibility_from_checkbox(data):
@@ -235,20 +258,20 @@ def validate_product(data):
     valid = True
     # validate the form
     if not data['name']:
-        flash("Product name is required")
+        flash("Product name is required", "error")
         valid = False
     if not data['description']:
-        flash("Description is required")
+        flash("Description is required", "error")
         valid = False
     if not data['weight']:
-        flash("Weight is required")
+        flash("Weight is required", "error")
         valid = False
     if not data['price']:
-        flash("Price is required")
+        flash("Price is required", "error")
         valid = False
     if not data['category']:
         valid = False
-        flash("Category is required")
+        flash("Category is required", "error")
     return valid
 
 
