@@ -83,7 +83,7 @@ def get_current_user_roles():
 def access_error_response():
     if not is_logged_in():
         flask.flash("You are required to login to view this page")
-        return flask.redirect(url_for("views.login", next=request.path))
+        return flask.redirect(url_for("login", next=request.path))
     return abort(403)
 
 

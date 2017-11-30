@@ -27,71 +27,158 @@
             margin: 8px 0;
             box-sizing: border-box;
         }
+
+        ::placeholder {
+            color: #ffffff;
+        }
+
+        .search-wrapper i.material-icons {
+            position: absolute;
+            top: -10px;
+
+        }
     </style>
 </head>
 <body>
 <div class="page">
-    <ul id="dropdownMenu" class="dropdown-content">
-        <li><a href="{{ url_for('logout') }}"><i class="material-icons right">fingerprint</i>Log
-            Out</a></li>
-        <li><a href="{{ url_for('view_account') }}"><i
-                class="material-icons right">accessibility</i> {{ session.user_name }}
-        </a></li>
-    </ul>
-    <nav>
+    {#    <ul id="dropdownMenu" class="dropdown-content">#}
+    {#        <li><a href="{{ url_for('logout') }}"><i class="material-icons right">fingerprint</i>Log#}
+    {#            Out</a></li>#}
+    {#        <li><a href="{{ url_for('view_account') }}"><i#}
+    {#                class="material-icons right">accessibility</i> {{ session.user_name }}#}
+    {#        </a></li>#}
+    {#    </ul>#}
+    {#    <nav class="nav-extended">#}
+    {#        <div class="nav-wrapper">#}
+    {#            <a href="/">Home</a>#}
+    {#            {% if not session.logged_in %}#}
+    {#                <ul class="nav-mobile right hide-on-med-and-down">#}
+    {#                    <li><a href="/">Home</a></li>#}
+    {#                    <li>#}
+    {#                        <a href="{{ url_for('login', next='/') }}"><i#}
+    {#                                class="material-icons right">fingerprint</i>Log#}
+    {#                            In</a>#}
+    {#                    </li>#}
+    {#                    <li><a href="{{ url_for('cart') }}">Cart - (<span id="itemsInCart">0</span>)</a>#}
+    {#                    </li>#}
+    {#                </ul>#}
+    {#            {% else %}#}
+    {#                <div class="row">#}
+    {#                <div class="col s6">#}
+    {#                    <ul class="right">#}
+    {#                        <li><a href="/">Home</a></li>#}
+    {#                        <li><a href="{{ url_for('cart') }}">Cart - (<span id="itemsInCart">0</span>)</a>#}
+    {#                        </li>#}
+    {#                        {% if user and user.accountType == 1 %}#}
+    {#                            <li><a href="{{ url_for('admin') }}">Admin</a></li>#}
+    {#                        {% endif %}#}
+    {#                        <li><a class="dropdown-button" href="#!" data-activates="dropdownMenu">Settings<i#}
+    {#                                class="material-icons right">arrow_drop_down</i></a></li>#}
+    {#                    </ul>#}
+    {#                </div>#}
+    {#            {% endif %}#}
+    {#            <form method="get" action="{{ url_for("view_products") }}" id="makeSearch" style="width: 300px;">#}
+    {#                <div class="input-field">#}
+    {#                                            <a href="#" id="searchButton"><i class="material-icons right">search</i></a>#}
+    {#                    <input id="search" type="search" name="search"#}
+    {#                           value="{{ search }}" required>#}
+    {#                    <label class="label-icon" for="search"><i class="material-icons">search</i></label>#}
+    {#                </div>#}
+    {#            </form>#}
+    {##}
+    {#            <div class="nav-content">#}
+    {#                <ul class="tabs tabs-transparent">#}
+    {#                    <li class="tab"><a href="#test1">Test 1</a></li>#}
+    {#                    <li class="tab"><a class="active" href="#test2">Test 2</a></li>#}
+    {#                    <li class="tab disabled"><a href="#test3">Disabled Tab</a></li>#}
+    {#                    <li class="tab"><a href="#test4">Test 4</a></li>#}
+    {#                </ul>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </nav>#}
+
+    <nav class="nav-extended">
         <div class="nav-wrapper">
-            {% if not session.logged_in %}
-                <ul class="right hide-on-med-and-down">
+            <a class="brand-logo" href="/">Nuclear Winners</a>
+            <a class="right button-collapse" href="#" data-activates="nav-mobile"><i
+                    class="mdi-navigation-more-vert"></i></a>
+
+            <ul id="dropdownMenu" class="dropdown-content">
+                <li><a href="{{ url_for('view_account') }}">{{ session.user_name }}
+                </a></li>
+                <li><a href="{{ url_for('view_account') }}"><i
+                        class="material-icons right">accessibility</i>Account
+                </a></li>
+                <li class="divider"></li>
+                <li><a href="{{ url_for('logout') }}"><i class="material-icons right">fingerprint</i>Log
+                    Out</a></li>
+            </ul>
+
+            <ul class="right hide-on-med-and-down" id="nav-mobile">
+                <li><a href="/">Products</a></li>
+                {% if not session.logged_in %}
                     <li>
-                        <a href="{{ url_for('login') }}"><i class="material-icons right">fingerprint</i>Log In</a>
+                        <a href="{{ url_for('login', next='/') }}"><i
+                                class="material-icons right">fingerprint</i>Log
+                            In</a>
                     </li>
-                </ul>
-            {% else %}
-                <div class="row">
-                    <form method="get" action="{{ url_for("view_products") }}" id="makeSearch">
-                        <div class="input-field nav-search col s5">
-                            <input id="searchBox" type="text" placeholder="Search for products" name="search"
-                                   value="{{ search }}">
-                        </div>
-                        <div class="col s1">
-                            <a href="#" id="searchButton"><i class="material-icons right">search</i></a>
-                        </div>
-                        <div class="col s6">
-                            <ul class="right">
-                                <li><a href="/">Home</a></li>
-                                <li><a href="{{ url_for('cart') }}">Cart - (<span id="itemsInCart">0</span>)</a>
-                                </li>
-                                {% if user and user.accountType == 1 %}
-                                    <li><a href="{{ url_for('admin') }}">Admin</a></li>
-                                {% endif %}
-                                <li><a class="dropdown-button" href="#!" data-activates="dropdownMenu">Settings<i
-                                        class="material-icons right">arrow_drop_down</i></a></li>
-                            </ul>
-                        </div>
-                    </form>
-                </div>
-            {% endif %}
-        </div>
-    </nav>
-    <div class="header">
-
-    </div>
-
-    <div class="content" style="clear: both">
-        <div class="flash">
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    <ul class=flashes>
-                        {% for message in messages %}
-                            <li>{{ message }}</li>
-                        {% endfor %}
-                    </ul>
+                {% else %}
+                    {% if session["user_admin"] %}
+                        <li><a href="{{ url_for('admin') }}">Admin</a></li>
+                    {% endif %}
+                    <li><a class="dropdown-button" href="#!" data-activates="dropdownMenu">{{ session.user_name }}<i
+                            class="material-icons right">arrow_drop_down</i></a></li>
                 {% endif %}
-            {% endwith %}
+                <li><a href="{{ url_for('cart') }}">Cart - (<span id="itemsInCart">0</span>)</a>
+                </li>
+            </ul>
+            <form class="green lighten-3 search-wrapper" style="width: 300px; margin-left: 300px; position: absolute;">
+                <div class="input-field">
+                    <input id="search" type="search" placeholder="Search for Products"/>
+                    <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                </div>
+            </form>
         </div>
-
-        {% block body %}{% endblock %}
+        {% if active_page == 'index' or active_page == 'search' %}
+            <div class="nav-content">
+                <ul class="tabs tabs-transparent">
+                    {% if active_page == 'search' %}
+                        <li class="tab" id="hot"><a href="#">Hot</a></li>
+                        <li class="tab" id="all"><a class="active" href="#">All</a></li>
+                    {% else %}
+                        <li class="tab" id="hot"><a class="active" href="#">Hot</a></li>
+                        <li class="tab" id="all"><a href="#">All</a></li>
+                    {% endif %}
+                    {% for cat in  catgories %}
+                        <li class="tab" id="{{ cat.id }}"><a href="#" id="{{ cat.id }}">{{ cat.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </nav>
+    <div class="progress" style="display: none">
+        <div class="indeterminate"></div>
     </div>
+</div>
+<div class="header">
+
+</div>
+
+<div class="content container" style="clear: both">
+    <div class="flash">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class=flashes>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    {% block body %}{% endblock %}
+</div>
 </div>
 
 <script>
@@ -104,28 +191,52 @@
             type: "GET",
             url: "/order/cart/count/",
             success: function (result) {
+                console.log(result);
                 $('#itemsInCart').html(result);
             }
         })
     });
-    document.getElementById("searchButton").onclick = function () {
-        document.getElementById("makeSearch").submit();
-    };
-    $('#searchBox').on('input', function () {
+    {#    document.getElementById("searchButton").onclick = function () {#}
+    {#        document.getElementById("makeSearch").submit();#}
+    {#    };#}
+
+    $('.tab').click(function () {
+        console.log("called");
+        $(".progress").css("display", "block");
+        $('#productSection').html("");
+        $.ajax({
+            type: "GET",
+            url: "/products/category/" + $(this).attr("id"),
+            success: function (result) {
+                console.log('Success');
+                console.log(result);
+                        $(".progress").css("display", "none");
+                $('#productSection').html(result);
+            }
+        })
+    });
+
+    $('#search').on('keyup', function (e) {
         console.log('Search Changed');
-        if ($('#productSection')) {
+        if ({{ "false" if active_page != 'index' or active_page != 'search' }}) {
             console.log('Is Product Section');
+            $(".progress").css("display", "block");
             $.ajax({
                 type: "GET",
-                url: "/products/search/?search=" + $('#searchBox').val(),
+                url: "/products/search/?search=" + $('#search').val(),
                 success: function (result) {
+                    $(".progress").css("display", "none");
                     console.log('Success');
                     console.log(result);
                     $('#productSection').html(result);
                 }
             })
+        } else if (e.which === 13) {
+            window.location.href = {{ url_for("view_products") }}+"?search=" + $('#search').val();
         }
     });
+
+
 </script>
 </body>
 </html>

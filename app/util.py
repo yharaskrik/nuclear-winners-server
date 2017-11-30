@@ -57,8 +57,9 @@ def clear_cart_id():
 def get_user_object():
     sql = 'SELECT * FROM User WHERE id = %s'
     with get_db().cursor() as cursor:
-        cursor.execute(sql, session['user_id'])
-        user = cursor.fetchone()
-        print(user)
-        return user
+        if 'user_id' in session:
+            cursor.execute(sql, session['user_id'])
+            user = cursor.fetchone()
+            print(user)
+            return user
     return None

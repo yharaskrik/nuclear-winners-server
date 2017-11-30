@@ -1,17 +1,10 @@
 {% extends 'layout.html' %}
+{% set active_page = "index" %}
 {% block body %}
-    <div class="row center-align">
-        <h2>Hot Products</h2>
-    </div>
     {% with %}
         {% set products = hot_products %}
         <div id="productSection">
             {% include 'product_cards.html' %}
         </div>
     {% endwith %}
-    <div class="center-align">
-        <p>
-            <a class="waves-effect waves-light btn" href="{{ url_for("view_products") }}">View All Products</a>
-        </p>
-    </div>
 {% endblock %}

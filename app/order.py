@@ -1,3 +1,5 @@
+from functools import reduce
+
 from flask import render_template, request, flash, url_for, redirect, abort, Response
 
 from config import TAX_RATE
@@ -5,9 +7,10 @@ from . import app
 from . import get_db
 from .payment_methods import get_payment_methods
 from .shipping import get_shipping_methods, get_shipping_method_price
-from .util import get_user_id, is_user_admin, get_user_object
+from .util import get_user_id, is_user_admin, get_user_object, is_logged_in, get_cart_id
 from .views.cart import validate_inventory
 from .views.user_login import requires_roles
+from .views.cart import get_session_cart
 
 
 @app.route("/checkout/", methods=['GET'])
@@ -124,17 +127,20 @@ cart_sql = "SELECT PC.cartID AS cartID, PC.sku AS sku, PC.quantity AS quantity, 
 
 def get_cart():
     user_id = get_user_id()
+    total_cart_sql = 'SELECT SUM(quantity) as total FROM ProductInCart WHERE cartID = %s'
     if user_id:
         with get_db().cursor() as cursor:
-            cursor.execute(cart_sql, user_id)
+            cursor.execute(total_cart_sql, get_cart_id())
             return cursor.fetchall()
     return
 
 
 @app.route('/order/cart/count/')
-@requires_roles('user')
 def cart_size():
-    return Response(str(len(get_cart())))
+    if is_logged_in():
+        return Response(str(get_cart()[0]["total"]))
+    else:
+        return Response(str(reduce(lambda x, y: x + y, get_session_cart().values())))
 
 
 @app.route('/order/details/<int:shipid>/')
