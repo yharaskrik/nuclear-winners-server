@@ -1,7 +1,18 @@
-from flask import Flask, g, session
+from flask import Flask, g
 
 import config
-import dbconfig
+
+try:
+    import dbconfig
+except Exception:
+    import os
+
+    dbconfig = lambda: None
+    dbconfig.db_host = os.environ.get('db_host', None)
+    dbconfig.db_user = os.environ.get('db_user', None)
+    dbconfig.db_password = os.environ.get('db_password', None)
+    dbconfig.db = os.environ.get('db', None)
+    dbconfig.db_charset = os.environ.get('db_charset', None)
 
 try:
     import pymysql
@@ -10,7 +21,7 @@ try:
 except ImportError:
     pass
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 app.config.from_object(config)
 
 
@@ -40,29 +51,9 @@ def close_db(error):
         g.db_connection.close()
 
 
-@app.route('/', defaults={'path': ''})
-def main_page(path):
-    # return render_template("product_list.html")
-    return redirect(url_for('view_products'))
-
 from app.views import views as views
 
 app.register_blueprint(views)
-
-
-@app.route("/session")
-def session_view():
-    print(session.get("name", "Default"))
-    output = ""
-    for k in session.keys():
-        output += k + ": " + str(session[k]) + "\n"
-    return output
-
-
-@app.route("/session/add")
-def add_session():
-    session["name"] = "klasjdfl"
-    return flask.redirect("/session")
 
 
 @app.errorhandler(403)
@@ -71,6 +62,18 @@ def not_authorized(e):
 
 
 from .product import *
+
 from .admin import *
 from .categories import *
+
+
+@app.route('/', defaults={'path': ''})
+def main_page(path):
+    # return render_template("product_list.html")
+    hot_products = get_hot_products()
+    return render_template("index.html", hot_products=hot_products)
+
+
 from .order import *
+from .mutations import get_mutations
+from .account import *

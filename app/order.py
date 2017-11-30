@@ -1,13 +1,28 @@
-from flask import render_template, request, flash, url_for, redirect, abort
+from flask import render_template, request, flash, url_for, redirect, abort, Response
 
 from config import TAX_RATE
 from . import app
 from . import get_db
 from .payment_methods import get_payment_methods
 from .shipping import get_shipping_methods, get_shipping_method_price
-from .util import get_user_id, is_user_admin
+from .util import get_user_id, is_user_admin, get_user_object
 from .views.cart import validate_inventory
 from .views.user_login import requires_roles
+
+insert_order = "INSERT INTO Shipment (status, userID, shippingMethodID, paymentMethodID, total) " \
+               "VALUES (0, %s, %s, %s, 0)"
+
+update_order_total = "UPDATE Shipment " \
+                     "SET total = %s " \
+                     "WHERE shipmentID = %s"
+
+insert_ordered_product = "INSERT INTO ShippedProduct(shipmentID, sku, quantity, price) VALUES (%s, %s, %s, %s)"
+clear_cart = "DELETE FROM ProductInCart WHERE cartID = %s"
+update_inventory = "UPDATE Product SET inventory = inventory - %s WHERE sku = %s"
+
+cart_sql = "SELECT PC.cartID AS cartID, PC.sku AS sku, PC.quantity AS quantity, P.name AS name, P.price AS price, P.weight AS weight, price * quantity AS subtotal " \
+           "FROM Cart C JOIN ProductInCart PC ON C.cartID = PC.cartID JOIN Product P ON PC.sku = P.sku " \
+           "WHERE C.userID = %s"
 
 
 @app.route("/checkout/", methods=['GET'])
@@ -30,7 +45,7 @@ def checkout(data=None):
     shipping = get_shipping_methods(total_weight)
 
     return render_template("order.html", shipping=shipping, payment=payment, cart=cart, total=total,
-                           weight=total_weight, data=data, tax=TAX_RATE)
+                           weight=total_weight, data=data, tax=TAX_RATE, address=get_user_object().get("address", ""))
 
 
 @app.route("/order/", methods=['POST'])
@@ -51,18 +66,18 @@ def place_order():
     data = request.form
     valid = True
     if "paymentMethod" not in data or not data["paymentMethod"]:
-        flash("Payment method is required")
+        flash("Payment method is required", "error")
         valid = False
     if "shippingMethod" not in data or not data["shippingMethod"]:
         valid = False
-        flash("Shipping method is required")
+        flash("Shipping method is required", "error")
 
     # Get the cart
     cart = get_cart()
 
     if not cart:
         valid = False
-        flash("Nothing in your cart")
+        flash("Nothing in your cart", "error")
 
     if not valid:
         # Return the form with entered values
@@ -72,7 +87,7 @@ def place_order():
 
     # Validate Product supply
     if not validate_inventory(cart_id):
-        flash("One of your products has more items then there is in stock")
+        flash("One of your products has more items then there is in stock", "error")
         return checkout(data)
 
     order_id = 0
@@ -97,29 +112,13 @@ def place_order():
             cursor.execute(clear_cart, cart_id)
             get_db().commit()
 
-        flash("Order place successfully")
+        flash("Order place successfully", "success")
 
     except Exception as e:
         app.logger.error(e)
-        flash("Unable to place order. Please try again")
+        flash("Unable to place order. Please try again", "error")
         return checkout(data)
     return redirect(url_for("single_order", shipid=order_id))
-
-
-insert_order = "INSERT INTO Shipment (status, userID, shippingMethodID, paymentMethodID, total) " \
-               "VALUES (0, %s, %s, %s, 0)"
-
-update_order_total = "UPDATE Shipment " \
-                     "SET total = %s " \
-                     "WHERE shipmentID = %s"
-
-insert_ordered_product = "INSERT INTO ShippedProduct(shipmentID, sku, quantity, price) VALUES (%s, %s, %s, %s)"
-clear_cart = "DELETE FROM ProductInCart WHERE cartID = %s"
-update_inventory = "UPDATE Product SET inventory = inventory - %s WHERE sku = %s"
-
-cart_sql = "SELECT PC.cartID AS cartID, PC.sku AS sku, PC.quantity AS quantity, P.name AS name, P.price AS price, P.weight AS weight, price * quantity AS subtotal " \
-           "FROM Cart C JOIN ProductInCart PC ON C.cartID = PC.cartID JOIN Product P ON PC.sku = P.sku " \
-           "WHERE C.userID = %s"
 
 
 def get_cart():
@@ -131,6 +130,12 @@ def get_cart():
     return
 
 
+@app.route('/order/cart/count/')
+@requires_roles('user')
+def cart_size():
+    return Response(str(len(get_cart())))
+
+
 @app.route('/order/details/<int:shipid>/')
 @requires_roles("user")
 def single_order(shipid):
@@ -138,7 +143,7 @@ def single_order(shipid):
           'FROM User, Product AS P, ShippedProduct AS S, Shipment ' \
           'WHERE User.id = Shipment.userID AND Shipment.shipmentID = S.shipmentID AND P.sku = S.sku AND S.shipmentID = %s'
 
-    order_sql = "SELECT S.userID AS user_id, S.paymentMethodID, S.total AS order_total, SM.methodName AS shipping_name, SM.price AS shipment_price " \
+    order_sql = "SELECT S.userID AS user_id, S.paymentMethodID, S.total AS order_total, SM.methodName AS shipping_name, SM.price AS shipment_price,S.status " \
                 "FROM Shipment S JOIN ShippingMethod SM ON S.shippingMethodID = SM.methodID " \
                 "WHERE shipmentID = %s"
 
@@ -154,7 +159,7 @@ def single_order(shipid):
         shipment = cursor.fetchone()
 
         if not shipment:
-            flash("Not a valid shipment")
+            flash("Not a valid shipment", "error")
             return abort(404)
 
         if not is_user_admin() and not get_user_id() == shipment["user_id"]:
@@ -162,4 +167,5 @@ def single_order(shipid):
 
         tax = int(round(product_total * TAX_RATE))
 
-        return render_template('single_order.html', data=data, sum=product_total, id=shipid, shipment=shipment, tax=tax)
+        return render_template('single_order.html', data=data, sum=product_total, id=shipid, shipment=shipment, tax=tax,
+                               user=get_user_object())

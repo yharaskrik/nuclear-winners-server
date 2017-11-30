@@ -1,5 +1,7 @@
 from flask import session
 
+from app import get_db
+
 
 def set_user_data(user_id, user_name, user_username, user_is_admin):
     """Adds the user data into the session"""
@@ -50,3 +52,13 @@ def get_cart_id():
 
 def clear_cart_id():
     session.pop("cart_id", None)
+
+
+def get_user_object():
+    sql = 'SELECT * FROM User WHERE id = %s'
+    with get_db().cursor() as cursor:
+        cursor.execute(sql, get_user_id())
+        user = cursor.fetchone()
+        print(user)
+        return user
+    return None
