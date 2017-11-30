@@ -98,8 +98,7 @@ def edit_product(sku):
         sql = update_prod_sql_with_image
         filename = request.files['image'].filename
         mime_type = request.files['image'].mimetype
-        file = request.files['image'].stream.read()
-        args.append(file)
+        args.append(fix_image(request.files['image'].stream))
 
     args.append(sku)
 
@@ -132,7 +131,7 @@ def add_product():
         sql = create_prod_sql_with_image
         filename = request.files['image'].filename
         mime_type = request.files['image'].mimetype
-        file = request.files['image'].stream.read()
+        file = fix_image(request.files['image'].stream)
         args.append(file)
     try:
         with get_db().cursor() as cursor:
@@ -146,13 +145,34 @@ def add_product():
     return render_template("add_product.html", data=request.form, user=get_user_object())
 
 
-@app.route("/product/<int:sku>/image.jpg")
+from PIL import Image
+
+
+@app.route("/product/<int:sku>/image.png")
 def product_picture(sku):
     """Retrieves a product image from the database and server it as an image file"""
     sql = "SELECT image FROM Product WHERE sku = %s"
     with get_db().cursor() as cursor:
         cursor.execute(sql, sku)
-        return send_file(io.BytesIO(cursor.fetchone()["image"]), mimetype="image/jpeg")
+        return send_file(io.BytesIO(cursor.fetchone()["image"]), mimetype="image/png")
+
+
+def fix_image(image_file):
+    """
+    See: https://stackoverflow.com/a/1386382/7459703
+    :param image_file: The file stream containing the image.
+    :return: The image bytes for the new photo
+    """
+    size = (300, 300)
+    image = Image.open(image_file)
+    image.thumbnail(size, Image.ANTIALIAS)
+    background = Image.new('RGBA', size, (255, 255, 255, 0))
+    background.paste(
+        image, (int((size[0] - image.size[0]) / 2), int((size[1] - image.size[1]) / 2))
+    )
+    stream = io.BytesIO()
+    background.save(stream, format="PNG")
+    return stream.getvalue()
 
 
 def product_visibility_from_checkbox(data):

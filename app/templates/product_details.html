@@ -3,7 +3,8 @@
     <div class="col s6 m6 l6">
         <div class="card horizontal center-align" style="height: 100%; align-content: center;">
             <div class="card-image">
-                <img src="/product/{{ product.sku }}/image.jpg" style="height: 100%; align-content: center;"/>
+                <img src="{{ url_for("product_picture", sku=product.sku) }}"
+                     style="height: 100%; align-content: center;"/>
             </div>
             <div class="card-stacked">
                 <span class="card-title">{{ product.name }}</span>
