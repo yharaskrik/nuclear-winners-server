@@ -35,7 +35,7 @@ def add_to_cart(pid):
         add_product_to_session_cart(pid, quantity, inventory)
     else:
         if add_product_to_user_cart(pid, quantity, inventory):
-            flash("Added product to cart")
+            flash("Added product to cart", "success")
 
     return redirect(request.referrer)
 
@@ -49,32 +49,32 @@ def delete_from_cart(pid):
     else:
         success = delete_from_user_cart(pid)
     if success:
-        flash('Removed from cart')
+        flash('Removed from cart', "success")
     else:
-        flash("Unable to remove the product from the cart")
+        flash("Unable to remove the product from the cart", "error")
     return redirect(request.referrer)
 
 
 @app.route('/cart/update/<int:pid>/')
 def update_cart(pid):
     if 'quantity' not in request.args:
-        flash('Quantity not specified')
+        flash('Quantity not specified', "error")
         return redirect(request.referrer)
 
     quantity = int(request.args['quantity'])
 
     if not checked_inventory(quantity, pid):
-        flash("Not enough product in stock")
+        flash("Not enough product in stock", "error")
         return redirect(request.referrer)
 
     if not is_logged_in():
         update_session_cart(pid, quantity)
-        flash("Updated the quantity in the cart")
+        flash("Updated the quantity in the cart", "success")
     else:
         if update_user_cart(pid, quantity):
-            flash("Updated the quantity in the cart")
+            flash("Updated the quantity in the cart", "success")
         else:
-            flash("Unable to update the cart")
+            flash("Unable to update the cart", "error")
     return redirect(request.referrer)
 
 
@@ -134,10 +134,10 @@ def add_product_to_session_cart(sku, quantity, inventory):
     new_quantity = session_cart.get(sku_s, 0) + quantity
 
     if new_quantity > inventory:
-        flash('No more product in stock')
+        flash('No more product in stock', "error")
     else:
         session_cart[sku_s] = new_quantity
-        flash("Added product to cart")
+        flash("Added product to cart", "success")
     return
 
 
@@ -164,7 +164,7 @@ def add_product_to_user_cart(sku, quantity, inventory):
             # If they don't have the item in their cart, add it
             if not product_in_cart:
                 if quantity > inventory:
-                    flash('Not enough product in stock')
+                    flash('Not enough product in stock', "error")
                     return False
 
                 cursor.execute('INSERT INTO ProductInCart(cartID, sku, quantity) '
@@ -175,7 +175,7 @@ def add_product_to_user_cart(sku, quantity, inventory):
             else:
                 new_quantity = quantity + product_in_cart["quantity"]
                 if new_quantity > inventory:
-                    flash('Not enough product in stock')
+                    flash('Not enough product in stock', "error")
                     return
                 cursor.execute('UPDATE ProductInCart SET quantity = quantity + %s '
                                'WHERE cartID = %s AND sku = %s',
@@ -185,7 +185,7 @@ def add_product_to_user_cart(sku, quantity, inventory):
 
     except Error as e:
         current_app.logger.error(e)
-        flash("Unable to add product to cart")
+        flash("Unable to add product to cart", "error")
         return False
 
 

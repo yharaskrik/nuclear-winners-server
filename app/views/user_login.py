@@ -1,7 +1,7 @@
 from functools import wraps
 
 import flask
-from flask import render_template, url_for, abort, request, flash, redirect
+from flask import render_template, url_for, abort, request, flash, redirect, current_app
 from werkzeug.security import check_password_hash
 
 from app.util import is_user_admin, is_logged_in, set_user_data, clear_user_data
@@ -28,7 +28,7 @@ def login():
         u = cursor.fetchone()
         if u:
             if not check_password_hash(u['pass'], data['password']):
-                flash("Invalid username or password")
+                flash("Invalid username or password", "error")
                 return redirect(request.referrer)
 
             # Add the user data into the session
@@ -36,7 +36,7 @@ def login():
             check_and_cache_cart_id(u["id"])
             transfer_session_cart_to_user_cart()
             return flask.redirect(next_link)
-    flash("Invalid username or password")
+    flash("Invalid username or password", "error")
     return redirect(request.referrer)
 
 
@@ -70,19 +70,19 @@ def get_current_user_roles():
     roles = []
     if is_user_admin():
         roles.append('admin')
-        print("Session is logged in as admin")
+        current_app.logger.debug("Session is logged in as admin")
     if is_logged_in():
         roles.append('user')
-        print("Session is logged in as a user")
+        current_app.logger.debug("Session is logged in as a user")
     else:
-        print("Session is not logged in")
+        current_app.logger.debug("Session is not logged in")
     return roles
 
 
 # http://flask.pocoo.org/snippets/98/
 def access_error_response():
     if not is_logged_in():
-        flask.flash("You are required to login to view this page")
+        flask.flash("You are required to login to view this page", "error")
         return flask.redirect(url_for("views.login", next=request.path))
     return abort(403)
 

@@ -106,11 +106,11 @@ def edit_product(sku):
         with get_db().cursor() as cursor:
             cursor.execute(sql, args)
             get_db().commit()
-            flash("Updated product")
+            flash("Updated product", "success")
             return redirect(url_for("view_product", sku=sku))
     except Exception as e:
         print(e)
-    flash("Unable to Edit product")
+    flash("Unable to Edit product", "error")
     return render_template("edit_product.html", data=data, user=get_user_object())
 
 
@@ -141,7 +141,7 @@ def add_product():
                 return redirect(url_for("view_product", sku=cursor.lastrowid))
     except Exception as e:
         print(e)
-    flash("Unable to create product")
+    flash("Unable to create product", "success")
     return render_template("add_product.html", data=request.form, user=get_user_object())
 
 
@@ -229,20 +229,20 @@ def validate_product(data):
     valid = True
     # validate the form
     if not data['name']:
-        flash("Product name is required")
+        flash("Product name is required", "error")
         valid = False
     if not data['description']:
-        flash("Description is required")
+        flash("Description is required", "error")
         valid = False
     if not data['weight']:
-        flash("Weight is required")
+        flash("Weight is required", "error")
         valid = False
     if not data['price']:
-        flash("Price is required")
+        flash("Price is required", "error")
         valid = False
     if not data['category']:
         valid = False
-        flash("Category is required")
+        flash("Category is required", "error")
     return valid
 
 
