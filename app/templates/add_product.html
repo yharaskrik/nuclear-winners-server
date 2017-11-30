@@ -1,21 +1,64 @@
 {% extends "layout.html" %}
 {% block body %}
-    <form enctype="multipart/form-data" method="post" action="/product/add">
-        Name: <input type="text" name="name" placeholder="Product Name" value="{{ data.name }}"/><br>
-        Description: <input type="text" name="description" placeholder="Description"
-                            value="{{ data.description }}"/><br>
-        Price: <input type="number" name="price" step="1" value="{{ data.price }}"/><br>
-        Weight: <input type="number" name="weight" step="any" value="{{ data.weight }}"><br>
-        Inventory: <input type="number" name="inventory" step="1" value="{{ data.inventory }}"><br>
-        Image: <input type="file" name="image" accept="image/*"/><br>
 
-        <label for="category">Category: </label>
-        <select name="category" title="Category">
-            {% for cat in categories %}
-                <option value="{{ cat.id }}">{{ cat.name }}</option>
-            {% endfor %}
-        </select><br>
-        <label for="showInStore">Show in Store</label><input type="checkbox" name="showInStore" value="1">
-        <input type="submit" name="Submit`">
-    </form>
+    <div class="card">
+        <div class="card-content">
+
+            <form id="addForm" enctype="multipart/form-data" method="post" action="/product/add">
+                <div class="input-field">
+                    <input id="nameField" type="text" name="name" value="{{ data.name }}"/>
+                    <label for="nameField">Name</label>
+                </div>
+                <div class="input-field">
+                    <input type="text" name="description" value="{{ data.description }}" id="descField"/>
+                    <label for="descField">Description</label>
+                </div>
+                <div class="input-field">
+                    <input type="number" name="price" step="1" id="priceField" value="{{ data.price }}"/>
+                    <label for="priceField">Price</label>
+                </div>
+                <div class="input-field">
+                    <input id="weightField" type="number" name="weight" step="any" value="{{ data.weight }}"/>
+                    <label for="weightField">Weight</label>
+                </div>
+                <div class="input-field">
+                    <input type="number" id="invField" name="inventory" step="1" value="{{ data.inventory }}"/>
+                    <label for="invField">Inventory</label>
+                </div>
+                <div class="input-field">
+                    <select id="category" name="category" title="Category">
+                        {% for cat in categories %}
+                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="category">Category:</label>
+                </div>
+                <div class="input-field">
+                    <input id="showInStore" type="checkbox" name="showInStore" value="1">
+                    <label for="showInStore">Show in Store</label>
+                </div>
+                <div class="input-field" style="margin-bottom: 60px">
+                    <div class="file-field input-field">
+                        <div class="btn">
+                            <span>Image</span>
+                            <input name="image" type="file" accept="image/*">
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path" type="text">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-action right-align">
+            <a href="#" id="submitAdd" class="btn btn-primary">Submit</a>
+        </div>
+    </div>
+
+    <script>
+        $('#submitAdd').on('click', function () {
+            $('#addForm').submit();
+        })
+    </script>
+
 {% endblock %}

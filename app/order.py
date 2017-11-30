@@ -8,9 +8,9 @@ from . import get_db
 from .payment_methods import get_payment_methods
 from .shipping import get_shipping_methods, get_shipping_method_price
 from .util import get_user_id, is_user_admin, get_user_object, is_logged_in, get_cart_id
+from .views.cart import get_session_cart
 from .views.cart import validate_inventory
 from .views.user_login import requires_roles
-from .views.cart import get_session_cart
 
 insert_order = "INSERT INTO Shipment (status, userID, shippingMethodID, paymentMethodID, total) " \
                "VALUES (0, %s, %s, %s, 0)"
@@ -124,9 +124,9 @@ def place_order():
     return redirect(url_for("single_order", shipid=order_id))
 
 
-def get_cart():
+def get_cart_total():
     user_id = get_user_id()
-    total_cart_sql = 'SELECT SUM(quantity) as total FROM ProductInCart WHERE cartID = %s'
+    total_cart_sql = 'SELECT SUM(quantity) AS total FROM ProductInCart WHERE cartID = %s'
     if user_id:
         with get_db().cursor() as cursor:
             cursor.execute(total_cart_sql, get_cart_id())
@@ -134,10 +134,19 @@ def get_cart():
     return
 
 
+def get_cart():
+    user_id = get_user_id()
+    if user_id:
+        with get_db().cursor() as cursor:
+            cursor.execute(cart_sql, user_id)
+            return cursor.fetchall()
+    return
+
+
 @app.route('/order/cart/count/')
 def cart_size():
     if is_logged_in():
-        return Response(str(get_cart()[0]["total"]))
+        return Response(str(get_cart_total()[0]["total"]))
     else:
         return Response(str(reduce(lambda x, y: x + y, get_session_cart().values())))
 
@@ -149,9 +158,11 @@ def single_order(shipid):
           'FROM User, Product AS P, ShippedProduct AS S, Shipment ' \
           'WHERE User.id = Shipment.userID AND Shipment.shipmentID = S.shipmentID AND P.sku = S.sku AND S.shipmentID = %s'
 
-    order_sql = "SELECT S.userID AS user_id, S.paymentMethodID, S.total AS order_total, SM.methodName AS shipping_name, SM.price AS shipment_price,S.status " \
-                "FROM Shipment S JOIN ShippingMethod SM ON S.shippingMethodID = SM.methodID " \
-                "WHERE shipmentID = %s"
+    order_sql = "SELECT S.userID AS user_id, S.paymentMethodID, S.total AS order_total, SM.methodName AS shipping_name, " \
+                "SM.price AS shipment_price, S.status, SM.description AS shippingMethodDesc, SM.shippingTime AS shippingTime, " \
+                "PM.description AS paymentMethodDesc, PM.name AS paymentMethodName " \
+                "FROM Shipment S JOIN ShippingMethod SM ON S.shippingMethodID = SM.methodID JOIN PaymentMethod PM ON S.paymentMethodID = PM.methodID " \
+                "WHERE S.shipmentID = %s"
 
     with get_db().cursor() as cursor:
         cursor.execute(sql, shipid)

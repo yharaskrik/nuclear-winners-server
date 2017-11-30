@@ -164,22 +164,22 @@
 
 </div>
 
-    <div class="content container" style="clear: both">
-        <div class="flash">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    <ul class="flashes collection">
-                        {% for category, message in messages %}
-                            {% if category == 'error' %}
-                                <li class="collection-item center-align red">{{ message }}</li>
-                            {% else %}
-                                <li class="collection-item center-align green">{{ message }}</li>
-                            {% endif %}
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endwith %}
-        </div>
+<div class="content container" style="clear: both">
+    <div class="flash">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes collection">
+                    {% for category, message in messages %}
+                        {% if category == 'error' %}
+                            <li class="collection-item center-align red">{{ message }}</li>
+                        {% else %}
+                            <li class="collection-item center-align green">{{ message }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
 
     {% block body %}{% endblock %}
 </div>
@@ -199,6 +199,25 @@
                 $('#itemsInCart').html(result);
             }
         })
+        $('#search').on('keyup', $.debounce(300, function (e) {
+            console.log('Search Changed');
+            if ({{ "false" if active_page != 'index' and active_page != 'search' else 'true' }}) {
+                console.log('Is Product Section');
+                $(".progress").css("display", "block");
+                $.ajax({
+                    type: "GET",
+                    url: "/products/search/?search=" + $('#search').val(),
+                    success: function (result) {
+                        $(".progress").css("display", "none");
+                        console.log('Success');
+                        console.log(result);
+                        $('#productSection').html(result);
+                    }
+                })
+            } else if (e.which === 13) {
+                window.location.href = {{ url_for("view_products") }}+"?search=" + $('#search').val();
+            }
+        }));
     });
     {#    document.getElementById("searchButton").onclick = function () {#}
     {#        document.getElementById("makeSearch").submit();#}
@@ -214,32 +233,11 @@
             success: function (result) {
                 console.log('Success');
                 console.log(result);
-                        $(".progress").css("display", "none");
+                $(".progress").css("display", "none");
                 $('#productSection').html(result);
             }
         })
     });
-
-    $('#search').on('keyup', function (e) {
-        console.log('Search Changed');
-        if ({{ "false" if active_page != 'index' or active_page != 'search' }}) {
-            console.log('Is Product Section');
-            $(".progress").css("display", "block");
-            $.ajax({
-                type: "GET",
-                url: "/products/search/?search=" + $('#search').val(),
-                success: function (result) {
-                    $(".progress").css("display", "none");
-                    console.log('Success');
-                    console.log(result);
-                    $('#productSection').html(result);
-                }
-            })
-        } else if (e.which === 13) {
-            window.location.href = {{ url_for("view_products") }}+"?search=" + $('#search').val();
-        }
-    });
-
 
 </script>
 </body>
