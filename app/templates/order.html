@@ -49,6 +49,9 @@
                                         <label for="{{ method.methodID }}p">{{ method.name }}</label>
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td>{{ method.description }}</td>
+                                </tr>
                             {% endfor %}
                         </table>
                     </div>
@@ -57,7 +60,8 @@
                 <div class="card">
                     <div class="card-content">
                         <span class="card-title">Shipping Method</span>
-                        <table>
+                        <p>Shipping Address: <br/>{{ address }}</p>
+                        <table border="1">
 
                             {% for method in shipping %}
                                 <tr>
@@ -67,9 +71,14 @@
                                                onclick="updateTotals()"/>
                                         <label for="{{ method.methodID }}s">{{ method.methodName }}</label>
                                     </td>
-                                    <td>
+                                    <td class="left-align">
                                         {{ method.price if method.price > 0 else "Free!" }}
                                     </td>
+                                    <td>{{ method.shippingTime }}</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">{{ method.description }}</td>
                                 </tr>
                             {% endfor %}
                         </table>
@@ -155,6 +164,10 @@
 
         $(document).ready(function () {
             $('input[type=radio][name=shippingMethod]').change(function () {
+                updateTotals();
+            });
+
+            $('input[type=radio][name=paymentMethod]').change(function () {
                 updateTotals();
             });
 
