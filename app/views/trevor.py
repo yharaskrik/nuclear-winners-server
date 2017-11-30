@@ -73,11 +73,27 @@ def register_user():
 @app.route('/admin/customers')
 @requires_roles("admin")
 def list_customers():
-    sql = 'SELECT * FROM User WHERE accountType = 0'
+    sql = 'SELECT * FROM User'
+
+    total_sold_sql = 'SELECT userID, SUM(quantity*price) AS total FROM Shipment JOIN ShippedProduct ON Shipment.shipmentID = ShippedProduct.shipmentID ' \
+    'GROUP BY Shipment.userID'
+
     with get_db().cursor() as cursor:
         cursor.execute(sql)
         data = cursor.fetchall()
-        return render_template('list_customers.html', data=data, user=get_user_object())
+        cursor.execute(total_sold_sql)
+        total_sold = cursor.fetchall()
+        totals = dict()
+        for p in data:
+            totals[p["id"]] = 0
+
+        print(totals)
+
+        for t in total_sold:
+            totals[t["userID"]] = int(t["total"])
+
+        print(totals)
+        return render_template('list_customers.html', data=data, user=get_user_object(), totals=totals)
     return 'picnic'
 
 

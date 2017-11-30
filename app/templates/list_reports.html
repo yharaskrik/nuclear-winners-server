@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
-    <p>Unshipped Orders: {{ totalorders }} Total Value: {{ totalsum }}</p>
-    <table border="1">
+    <div class="card">
+    <div class="card-content">
+    <span class="card-title">Unshipped Orders: {{ totalorders }}</span>
+        <table class="striped">
         <tr>
             <th>Shipment ID</th>
             <th>User ID</th>
@@ -23,13 +25,22 @@
                 <td>{{ order['payment'] }}</td>
                 <td>{{ order['total'] }}</td>
                 <td><a href="{{ url_for('send_order',shipid=order['shipmentID']) }}"
-                       class="waves-effect waves-light btn">Send Order</a></td>
+                       class="waves-effect waves-light btn">Ship Order</a></td>
             </tr>
         {% endfor %}
+        <tr>
+            <td colspan="6">
+                Total Value:
+            </td>
+            <td>{{ totalsum }}</td>
+        </tr>
     </table>
-
-    <p>Finished Orders: {{ finishedorders }} Total Value: {{ finishedsum }}</p>
-    <table border="1">
+    </div>
+</div>
+        <div class="card">
+    <div class="card-content">
+    <span class="card-title">Finished Orders: {{ finishedorders }}</span>
+    <table border="1" class="striped">
         <tr>
             <th>Shipment ID</th>
             <th>User ID</th>
@@ -51,5 +62,11 @@
                 <td>{{ order['total'] }}</td>
             </tr>
         {% endfor %}
+            <tr>
+            <td colspan="6">
+                Total Value:
+            </td>
+            <td>{{ finishedsum }}</td>
+        </tr>
     </table>
 {% endblock %}
