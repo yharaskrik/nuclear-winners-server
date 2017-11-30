@@ -4,6 +4,8 @@
 from flask import request, render_template, flash, url_for, current_app
 from werkzeug.security import generate_password_hash
 
+from app.mutations import get_mutations
+from app.mutations import set_mutations
 from app.util import get_user_object
 from . import get_db, app, requires_roles, redirect
 
@@ -11,49 +13,56 @@ from . import get_db, app, requires_roles, redirect
 # allows users to create an account
 @app.route('/user/register', methods=['post', 'get'])
 def register_user():
+    mutations = get_mutations()
+
     if request.method == 'GET':
-        return render_template("register_user.html", data={})
+        return render_template("register_user.html", data=dict(), mutations=mutations)
 
     data = request.form
     username = data['username']
 
+    current_app.logger.debug(data)
+
     if not data.get("password"):
         flash("Passwords cannot be empty", "error")
-        return render_template('register_user.html', data=data)
+        return render_template('register_user.html', data=data, mutations=mutations)
 
     # validates entered information
     if data['password'] != data['confirmpassword']:
         flash("Password does not match.", "error")
-        return render_template('register_user.html', data=data)
+        return render_template('register_user.html', data=data, mutations=mutations)
 
     if not data['name'] or not data['username'] or not data['password'] or not data['address']:
         flash("All fields are required.", "error")
-        return render_template('register_user.html', data=data)
+        return render_template('register_user.html', data=data, mutations=mutations)
 
-    sql = 'INSERT INTO User(name,pass,address,accountType,username) VALUES(%s,%s,%s,0,%s)'
+    sql = 'INSERT INTO User(name,pass,address,accountType,username, faction) VALUES(%s,%s,%s,0,%s, %s)'
 
     try:
         with get_db().cursor() as cursor:
             cursor.execute(sql, (data['name'],
                                  generate_password_hash(data['password'], method='pbkdf2:sha256', salt_length=8),
-                                 data['address'], data['username']))
+                                 data['address'], data['username'], data.get("faction")))
+            user_id = cursor.lastrowid
+            mutation_ids = request.form.getlist('mutations')
 
             if data.get('robot', "") == 'robot':
-                sql2 = 'SELECT * FROM User WHERE username = %s'
-                cursor.execute(sql2, username)
-                uid = cursor.fetchone()
-                sql3 = 'INSERT INTO UserMutation(userID, mutationID) VALUES(%s,1)'
-                cursor.execute(sql3, uid['id'])
+                mutation_ids.append("1")
+
+            if mutation_ids:
+                set_mutations(user_id, mutation_ids)
 
             # Create a cart for this user
-            cursor.execute('INSERT INTO Cart(userID) VALUES (%s)', cursor.lastrowid)
+            cursor.execute('INSERT INTO Cart(userID) VALUES (%s)', user_id)
+
             get_db().commit()
+
         flash("Account created", "success")
         return redirect(url_for("login"))
     except Exception as e:
         current_app.logger.error(e)
         flash('This username already exists', "error")
-        return render_template('register_user.html', data=data)
+        return render_template('register_user.html', data=data, mutations=mutations)
 
 
 # allows admins to see a list of all customers

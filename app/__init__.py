@@ -6,6 +6,7 @@ try:
     import dbconfig
 except Exception:
     import os
+
     dbconfig = lambda: None
     dbconfig.db_host = os.environ.get('db_host', None)
     dbconfig.db_user = os.environ.get('db_user', None)
@@ -74,3 +75,4 @@ def main_page(path):
 
 
 from .order import *
+from .mutations import get_mutations
