@@ -148,6 +148,9 @@ def cart_size():
     if is_logged_in():
         return Response(str(get_cart_total()[0]["total"]))
     else:
+        cart = get_session_cart()
+        if not cart.values():
+            return Response(str(0))
         return Response(str(reduce(lambda x, y: x + y, get_session_cart().values())))
 
 

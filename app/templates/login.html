@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col s12">
             <div class="card">
-                <form action="/user/login" method="post" id="loginForm">
+                <form action="{{ url_for("login", next=request.args.next    ) }}" method="post" id="loginForm">
                     <div class="card-content">
                         <span class="card-title"><i class="material-icons">fingerprint</i>Log In Here</span>
                         <div class="input-field">
