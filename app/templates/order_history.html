@@ -1,49 +1,71 @@
 {% extends 'layout.html' %}
 {% block body %}
-    <div class="row">
-        <div class="card">
-            <div class="card-content">
-                <table class="highlight">
+
+    <ul class="collapsible popout" data-collapsible="accordian">
+        <li>
+            <div class="collapsible-header">
+                    <table>
+                        <tr>
+                            <th style="width: 10%">Shipment ID</th>
+                            <th style="width: 25%">Order Status</th>
+                            <th style="width: 25%">Shipping Method</th>
+                            <th style="width: 25%">Payment Method</th>
+                            <th style="width: 5%">Total</th>
+                        </tr>
+                    </table>
+                </div>
+        </li>
+        {% for order in orders %}
+            <li>
+                <div class="collapsible-header">
+                    <table>
+                        <tr>
+                            <td style="width: 10%">{{ order.shipmentID }}</td>
+                            <td style="width: 25%">{{ 'Shipped' if order.status == 1 else 'Processing' }}</td>
+                            <td style="width: 25%">{{ order.shippingMethodName }}</td>
+                            <td style="width: 25%">{{ order.paymentMethodName }}</td>
+                            <td style="width: 5%">{{ order.total }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="collapsible-body" style="background-color: white;">
+                    <table class="striped">
+                        <tr>
+                            <td> Product Name</td>
+                            <td> Quantity</td>
+                            <td> Total Price</td>
+                        </tr>
+                        {% for product in order.products %}
+                            <tr>
+                                <td> {{ product.name }} </td>
+                                <td> {{ product.quantity }} </td>
+                                <td> {{ product.total }} </td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td> Subtotal:</td>
+                            <td></td>
+                            <td> {{ order.subtotal }} </td>
+                        </tr>
+                        <tr>
+                            <td> Tax:</td>
+                            <td></td>
+                            <td> {{ (order.subtotal * 0.16)|round|int }} </td>
+                        </tr>
+                        <tr>
+                            <td> Shipping Price:</td>
+                            <td></td>
+                            <td> {{ 'Free' if order.shippingPrice == 0 else order.shippingPrice }} </td>
+                        </tr>
                     <tr>
-                        <td> ShipmentID</td>
-                        <td> Status</td>
-                        <td> Shipment Method</td>
-                        <td> Payment Method</td>
-                    </tr>
-                    {% for order in orders %}
-                        <tr>
-                            <td> {{ order.shipmentID }} </td>
-                            <td> {{ order.status }} </td>
-                            <td> {{ order.shippingMethodID }} </td>
-                            <td> {{ order.paymentMethodID }} </td>
-                            <td colspan=3>
-                                <table>
-                                    <tr>
-                                        <td> Product Name</td>
-                                        <td> Quantity</td>
-                                        <td> Total Price</td>
-                                    </tr>
-                                    {% for product in order.products %}
-                                        <tr>
-                                            <td> {{ product.name }} </td>
-                                            <td> {{ product.quantity }} </td>
-                                            <td> {{ product.total }} </td>
-                                        </tr>
-                                    {% endfor %}
-                                    <tr>
-                                        <td> Subtotal:</td>
-                                        <td></td>
-                                        <td> {{ order.total }} </td>
-                                    </tr>
-                                </table>
-                            </td>
+                            <td> Total:</td>
+                            <td></td>
+                            <td> {{ order.total }} </td>
                         </tr>
-                        <tr>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
-    </div>
+                    </table>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
 
 {% endblock %}

@@ -16,6 +16,8 @@ def login():
     if "next" in request.args:
         next_link = request.args["next"]
 
+    print(next_link)
+
     if flask.request.method == 'GET':
         return render_template("login.html", next=next_link)
 
@@ -29,7 +31,7 @@ def login():
         if u:
             if not check_password_hash(u['pass'], data['password']):
                 flash("Invalid username or password", "error")
-                return redirect(request.referrer)
+                return render_template("login.html", next=next_link)
 
             # Add the user data into the session
             set_user_data(u["id"], u["name"], u["username"], u['accountType'] == 1)
@@ -37,7 +39,7 @@ def login():
             transfer_session_cart_to_user_cart()
             return flask.redirect(next_link)
     flash("Invalid username or password", "error")
-    return redirect(request.referrer)
+    return render_template("login.html", next=next_link)
 
 
 def check_and_cache_cart_id(user_id):

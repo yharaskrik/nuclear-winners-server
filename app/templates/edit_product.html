@@ -4,77 +4,62 @@
     <div class="card">
         <div class="card-content">
             <div class="row">
-                <form enctype="multipart/form-data" method="post" action="/product/{{ data.sku }}/edit">
-                    <div class="row">
-                        <div class="input-field">
-                            <input id="sku" type="hidden" name="sku" value="{{ data.sku }}"/>
-                            <label for="sku">SKU</label>
-                        </div>
+                <form enctype="multipart/form-data" id="editForm" method="post" action="/product/{{ data.sku }}/edit">
+                    <div class="input-field">
+                        <input id="nameField" type="text" name="name" value="{{ data.name }}"/>
+                        <label for="nameField">Name</label>
                     </div>
-                    <div class="row">
-                        <div class="input-field">
-                            <input id="name" type="text" name="name" placeholder="Product Name"
-                                   value="{{ data.name }}"/>
-                            <label for="name">Name</label>
-                        </div>
+                    <div class="input-field">
+                        <input type="text" name="description" value="{{ data.description }}" id="descField"/>
+                        <label for="descField">Description</label>
                     </div>
-                    <div class="row">
-                        <div class="input-field">
-                            <input id="description" type="text" name="description" placeholder="Description"
-                                   value="{{ data.description }}"/>
-                            <label for="description">Description</label>
-                        </div>
+                    <div class="input-field">
+                        <input type="number" name="price" step="1" id="priceField" value="{{ data.price }}"/>
+                        <label for="priceField">Price</label>
                     </div>
-                    <div class="row">
-                        <div class="input-field">
-                            <input id="price" type="number" name="price" step="1" value="{{ data.price }}"/>
-                            <label for="price">Price</label>
-                        </div>
-                        <div class="row">
-                            <div class="input-field">
-                                <input id="weight" type="number" name="weight" step="any" value="{{ data.weight }}"/>
-                                <label for="weight">Weight</label>
+                    <div class="input-field">
+                        <input id="weightField" type="number" name="weight" step="any" value="{{ data.weight }}"/>
+                        <label for="weightField">Weight</label>
+                    </div>
+                    <div class="input-field">
+                        <input type="number" id="invField" name="inventory" step="1" value="{{ data.inventory }}"/>
+                        <label for="invField">Inventory</label>
+                    </div>
+                    <div class="input-field">
+                        <select id="category" name="category" title="Category">
+                            {% for cat in categories %}
+                                <option value="{{ cat.id }}">{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="category">Category:</label>
+                    </div>
+                    <p>
+                        <input id="showInStore" type="checkbox" name="showInStore" value="1" {{ "checked=checked" if data.showInStore == '1' else "" }}>
+                        <label for="showInStore">Show in Store</label>
+                    </p>
+                    <div class="input-field" style="margin-bottom: 60px">
+                        <div class="file-field input-field">
+                            <div class="btn">
+                                <span>Image</span>
+                                <input name="image" type="file" accept="image/*">
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="input-field">
-                                <input id="inventory" type="number" name="inventory" step="1"
-                                       value="{{ data.inventory }}"/>
-                                <label for="inventory">Inventory</label>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="input-field">
-                                Image: <input type="file" name="image" accept="image/*"/><br>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="input-field">
-                                <select name="category" title="Category">
-                                    {% for cat in categories %}
-                                        <option value="{{ cat.id }}" {{ "selected=\"selected\"" if cat.id == data.category }}>{{ cat.name }}</option>
-                                    {% endfor %}
-                                </select>
-                                <label>Category</label>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <p>
-                                <input id="showInStore"
-                                       type="checkbox"
-                                       name="showInStore"
-                                       value="1" {{ "checked=checked" if data.showInStore == '1' else "" }} />
-                                <label for="showInStore">Show in Store</label>
-                            </p>
-                        </div>
-                        <div class="row">
-                            <div class="input-field">
-                                <input type="submit" name="Submit">
+                            <div class="file-path-wrapper">
+                                <input class="file-path" type="text">
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
+            <div class="card-action right-align">
+                <a href="#" id="submitAdd" class="btn btn-primary">Save</a>
+            </div>
         </div>
+
+        <script>
+            $('#submitAdd').on('click', function () {
+                $('#editForm').submit();
+            })
+        </script>
+    </div>
     </div>
 {% endblock %}

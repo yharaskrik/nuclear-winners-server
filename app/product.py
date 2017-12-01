@@ -21,7 +21,6 @@ filter_prod_sql = "SELECT * FROM Product WHERE Product.visible = 1 AND Product.n
 
 
 @app.route("/products/", methods=['GET'])
-@app.route("/products/category/<int:cid>", methods=['GET'])
 def view_products(cid=None):
     sql = list_prod_sql
 
@@ -39,7 +38,36 @@ def view_products(cid=None):
     with get_db().cursor() as cursor:
         cursor.execute(sql, args)
         result = cursor.fetchall()
-        return render_template("product_list.html", products=result, search=search, cid=cid, user=get_user_object())
+
+        user = get_user_object()
+        if user:
+            return render_template("product_list.html", products=result, search=search, cid=cid,
+                                   user=user)
+        else:
+            return render_template("product_list.html", products=result, search=search, cid=cid)
+
+
+@app.route("/products/category/<string:cid>", methods=['GET'])
+def product_categories(cid=None):
+    if cid == "all":
+        return ajax_products()
+    elif cid == "hot":
+        return render_template("product_cards.html", products=get_hot_products())
+
+
+    sql = list_prod_sql
+
+
+
+    sql += " and category = %s"
+
+    args = []
+    args.append(int(cid))
+
+    with get_db().cursor() as cursor:
+        cursor.execute(sql, args)
+        result = cursor.fetchall()
+        return render_template("product_cards.html", products=result)
 
 
 @app.route("/products/search/", methods=['GET'])
@@ -52,9 +80,7 @@ def ajax_products():
             cursor.execute(list_prod_sql)
 
         result = cursor.fetchall()
-
-        return render_template("product_cards.html", products=result, search=request.args["search"],
-                               user=get_user_object())
+        return render_template("product_cards.html", products=result, search=request.args.get("search", ""))
 
 
 @app.route("/product/<sku>")
