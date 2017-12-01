@@ -1,8 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
-    <div id="cartWrapper" style="width: 100%; margin: 0 auto; text-align: center;">
         <div class="row">
-            <div class="col s7" id="cart-items">
+            <div class="col s8" id="cart-items">
                 <ul class="collection" style="">
                     {% for item in cart %}
                         <li class="collection-item avatar" style="">
@@ -38,7 +37,7 @@
                 </ul>
             </div>
 
-            <div class="col s3" id="sidebar">
+            <div class="col s4" id="sidebar">
                 <div id="order-summary">
                     <div class="card">
                         <div class="card-content">
@@ -58,7 +57,7 @@
                 </div>
             </div>
         </div>
-    </div>
+
     <script>
         function updateQuantity() {
             console.log('Updating quantity()');

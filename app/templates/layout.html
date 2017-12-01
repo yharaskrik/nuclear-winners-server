@@ -190,12 +190,16 @@
     $(document).ready(function () {
         $(".dropdown-content").dropdown();
         $("select").material_select();
+        $('.collapsible').collapsible();
 
         $.ajax({
             type: "GET",
             url: "/order/cart/count/",
             success: function (result) {
                 console.log(result);
+                if (result === 'None') {
+                    result = '0'
+                }
                 $('#itemsInCart').html(result);
             }
         })

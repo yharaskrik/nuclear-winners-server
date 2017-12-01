@@ -21,9 +21,8 @@ def view_account():
         cursor.execute(
             'SELECT * FROM UserMutation INNER JOIN Mutation ON UserMutation.mutationID = Mutation.id WHERE userID = %s',
             get_user_id())
+
         mutatiions = cursor.fetchall()
-        for mutation in mutatiions:
-            print(mutation)
         return render_template('account.html', user=user, mutations=mutatiions)
 
 
@@ -32,8 +31,10 @@ def view_account():
 def order_history():
     # get information on the orderids related to the user
     with get_db().cursor() as cursor:
-        cursor.execute('SELECT S.shipmentID, S.status, S.shippingMethodID, S.paymentMethodID, S.total '
-                       'FROM Shipment AS S WHERE S.userID = %s', session['user_id'])
+        cursor.execute('SELECT S.shipmentID, S.status, S.shippingMethodID, S.paymentMethodID, S.total, PM.name AS paymentMethodName, '
+                       'ShippingMethod.methodName AS shippingMethodName, ShippingMethod.price AS shippingPrice '
+                       'FROM Shipment AS S JOIN ShippingMethod ON S.shippingMethodID = ShippingMethod.methodID'
+                       ' JOIN PaymentMethod AS PM ON S.paymentMethodID = PM.methodID WHERE S.userID = %s', session['user_id'])
         orders = cursor.fetchall()
         # loop through, getting all the products in each of the orders
         for order in orders:
@@ -42,6 +43,10 @@ def order_history():
                            'WHERE SP.sku = P.sku AND SP.shipmentID = %s', order['shipmentID'])
             order['products'] = cursor.fetchall()
             # add the total prices together to make a subtotal
+            total = 0
+            for p in order['products']:
+                total += p['total']
+            order['subtotal'] = total
         return render_template('order_history.html', orders=orders, user=get_user_object())
 
 
