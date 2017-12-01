@@ -2,15 +2,15 @@ from functools import reduce
 
 from flask import render_template, request, flash, url_for, redirect, abort, Response
 
+from app.cart import get_session_cart
+from app.cart import validate_inventory
+from app.user_login import requires_roles
 from config import TAX_RATE
 from . import app
 from . import get_db
 from .payment_methods import get_payment_methods
 from .shipping import get_shipping_methods, get_shipping_method_price
 from .util import get_user_id, is_user_admin, get_user_object, is_logged_in, get_cart_id
-from .views.cart import get_session_cart
-from .views.cart import validate_inventory
-from .views.user_login import requires_roles
 
 insert_order = "INSERT INTO Shipment (status, userID, shippingMethodID, paymentMethodID, total) " \
                "VALUES (0, %s, %s, %s, 0)"

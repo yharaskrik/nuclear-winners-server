@@ -1,7 +1,7 @@
 from flask import render_template, session, request, redirect, flash, current_app
 from pymysql import Error
 
-from app.util import is_logged_in, get_cart_id, get_user_object
+from .util import is_logged_in, get_cart_id, get_user_object
 from . import get_db, app as app
 
 

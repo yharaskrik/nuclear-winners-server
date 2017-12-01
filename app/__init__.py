@@ -51,20 +51,9 @@ def close_db(error):
         g.db_connection.close()
 
 
-from app.views import views as views
-
-app.register_blueprint(views)
-
-
 @app.errorhandler(403)
 def not_authorized(e):
     return render_template("403.html")
-
-
-from .product import *
-
-from .admin import *
-from .categories import *
 
 
 @app.route('/', defaults={'path': ''})
@@ -74,6 +63,11 @@ def main_page(path):
     return render_template("index.html", hot_products=hot_products)
 
 
-from .order import *
-from .mutations import get_mutations
 from .account import *
+from .admin import *
+from .cart import *
+from .categories import *
+from .mutations import get_mutations
+from .order import *
+from .product import *
+from .user_login import *

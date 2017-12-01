@@ -1,8 +1,8 @@
 from flask import render_template, request, redirect, flash, url_for
 
+from app.user_login import requires_roles
 from . import app, get_db
 from .util import get_user_object
-from .views.user_login import requires_roles
 
 
 @app.route("/admin/categories")
