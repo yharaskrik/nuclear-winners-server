@@ -1,6 +1,6 @@
 <div class="row">
     {% for item in products %}
-        <div class="col s2">
+        <div class="col s3">
             <div class="card center-align large">
                 <div class="card-image">
                     <a href="{{ url_for('view_product', sku=item.sku) }}"><img
@@ -20,8 +20,15 @@
                     </a>
                 </div>
                 <div class="card-action green darken-4">
-                    <a style="display: block;" href="{{ url_for('add_to_cart', pid = item.sku) }}" id="addToCart">
-                        <i class="material-icons">add</i>Add to Cart</a>
+                    {% if item.inventory > 0 %}
+                        <a style="display: block;" href="{{ url_for('add_to_cart', pid = item.sku) }}" id="addToCart">
+                            <i class="material-icons">add</i>Add to Cart</a>
+                    {% else %}
+                        <a style="display: block; cursor: default" href="#" id="addToCart">
+                            <i class="material-icons" style="visibility: hidden">add</i>
+                            Out of Stock
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>

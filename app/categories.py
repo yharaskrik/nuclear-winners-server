@@ -63,6 +63,11 @@ def view_categories():
     return render_template('list_categories.html', categories=cat, user=get_user_object())
 
 
+@app.context_processor
+def categories_list():
+    return dict(catgories=fetch_categories())
+
+
 def fetch_categories():
     """Fetched and returns all the categories from the database
 

@@ -4,10 +4,12 @@
         <div class="col s12">
             <div class="card">
                 <div class="card-title center-align">
-                    <h3>Shipment ID: {{ id }} {% if session["user_admin"] %} {{ data['user'] }} {% endif %} Total
-                        Value: {{ sum }} {% if session["user_admin"] and shipment.status == 0 %}
-                            <a href="{{ url_for('send_order',shipid=id) }}"
-                               class="waves-effect waves-light btn">Submit</a>{% endif %}</h3>
+                    <h2>Shipment ID: {{ id }}</h2>
+                    <h3>Status: {{ 'Order Processing' if shipment.status == 0 else 'Order Shipped' }}</h3>
+                    <h4>Shipped By: {{ shipment.shipping_name }}</h4>
+                    <p>{{ shipment.shippingMethodDesc }}</p>
+                    <h4>Estimated Delivery Time: {{ shipment.shippingTime }}</h4>
+                    <h4>Paid By: {{ shipment.paymentMethodName }}</h4>
                 </div>
                 <div class="card-content">
                     <table border="1" class="bordered highlight">
@@ -60,6 +62,12 @@
                         </tr>
                     </table>
                 </div>
+            <div class="card-action">
+                {% if session["user_admin"] %} {{ data['user'] }} {% endif %}
+                        {% if session["user_admin"] and shipment.status == 0 %}
+                            <a href="{{ url_for('send_order',shipid=id) }}"
+                               class="waves-effect waves-light btn">Set Order Shipped</a>{% endif %}
+            </div>
             </div>
         </div>
     </div>
