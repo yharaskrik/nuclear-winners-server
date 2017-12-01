@@ -1,13 +1,13 @@
 from functools import wraps
 
 import flask
-from flask import render_template, url_for, abort, request, flash, redirect, current_app
+from flask import render_template, url_for, abort, request, flash, current_app
 from werkzeug.security import check_password_hash
 
-from app.util import is_user_admin, is_logged_in, set_user_data, clear_user_data
-from app.util import set_cart_id
-from . import app, get_db
 from .cart import transfer_session_cart_to_user_cart
+from .util import is_user_admin, is_logged_in, set_user_data, clear_user_data
+from .util import set_cart_id
+from . import app, get_db
 
 
 @app.route('/user/login', methods=['GET', 'POST'])

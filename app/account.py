@@ -1,10 +1,11 @@
 from flask import session, render_template, request, flash, current_app, url_for, redirect
 from pymysql import Error
+from werkzeug.security import generate_password_hash
 
-from app import get_db, requires_roles, get_user_object
-from app.mutations import get_user_mutations, get_mutations, set_mutations
-from app.views import app
-from .util import get_user_id
+from app.user_login import requires_roles
+from . import get_db, app
+from .mutations import get_user_mutations, get_mutations, set_mutations
+from .util import get_user_id, get_user_object
 
 update_account_sql = "UPDATE User SET address = %s, faction = %s WHERE id = %s"
 
@@ -87,3 +88,63 @@ def edit_account():
         flash("Unable to update account details", "error")
         current_app.logger.error(e)
     return redirect(url_for("view_account"))
+
+
+@app.route('/user/register', methods=['post', 'get'])
+def register_user():
+    mutations = get_mutations()
+
+    if request.method == 'GET':
+        return render_template("register_user.html", data=dict(), mutations=mutations)
+
+    data = request.form
+    username = data['username']
+
+    current_app.logger.debug(data)
+
+    if not data.get("password"):
+        flash("Passwords cannot be empty", "error")
+        return render_template('register_user.html', data=data, mutations=mutations)
+
+    # validates entered information
+    if data['password'] != data['confirmpassword']:
+        flash("Password does not match.", "error")
+        return render_template('register_user.html', data=data, mutations=mutations)
+
+    if not data['name'] or not data['username'] or not data['password'] or not data['address']:
+        flash("All fields are required.", "error")
+        return render_template('register_user.html', data=data, mutations=mutations)
+
+    sql = 'INSERT INTO User(name,pass,address,accountType,username, faction) VALUES(%s,%s,%s,0,%s, %s)'
+
+    try:
+        with get_db().cursor() as cursor:
+            cursor.execute(sql, (data['name'],
+                                 generate_password_hash(data['password'], method='pbkdf2:sha256', salt_length=8),
+                                 data['address'], data['username'], data.get("faction")))
+            user_id = cursor.lastrowid
+            print("Staring mutations")
+            mutation_ids = request.form.getlist('mutations')
+            if data.get('robot', "") == 'robot':
+                mutation_ids.append("1")
+
+
+            if mutation_ids:
+                print("Calling mutations")
+                set_mutations(user_id, mutation_ids)
+
+            # Create a cart for this user
+            print("Creating cart")
+            cursor.execute('INSERT INTO Cart(userID) VALUES (%s)', user_id)
+
+            print("Committing user account")
+            get_db().commit()
+
+        flash("Account created", "success")
+        return redirect(url_for("login"))
+    except Exception as e:
+        current_app.logger.error(e)
+        flash('Unable to create your account. Please try again with a different user name', "error")
+        return render_template('register_user.html', data=data, mutations=mutations)
+
+

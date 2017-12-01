@@ -10,7 +10,8 @@
                             <th style="width: 25%">Order Status</th>
                             <th style="width: 25%">Shipping Method</th>
                             <th style="width: 25%">Payment Method</th>
-                            <th style="width: 5%">Total</th>
+                            <th style="width: 10%" class="left-align">Total</th>
+                            <th style="width: 5%">&nbsp;</th>
                         </tr>
                     </table>
                 </div>
@@ -24,7 +25,8 @@
                             <td style="width: 25%">{{ 'Shipped' if order.status == 1 else 'Processing' }}</td>
                             <td style="width: 25%">{{ order.shippingMethodName }}</td>
                             <td style="width: 25%">{{ order.paymentMethodName }}</td>
-                            <td style="width: 5%">{{ order.total }}</td>
+                            <td style="width: 10%">{{ order.total }}</td>
+                            <td style="width: 5%"><i class="material-icons">visibility</i></td>
                         </tr>
                     </table>
                 </div>

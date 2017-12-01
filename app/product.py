@@ -4,9 +4,9 @@ from flask import request, render_template, flash, url_for, redirect, send_file,
 from pymysql import Error
 
 from app import app, get_db
+from app.user_login import requires_roles
 from app.util import get_user_object
 from .categories import fetch_categories
-from .views.user_login import requires_roles
 
 create_prod_sql_with_image = "INSERT INTO Product (name, description , price, weight, inventory, visible, category, image) " \
                              "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
